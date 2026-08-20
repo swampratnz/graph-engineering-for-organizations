@@ -1,0 +1,35 @@
+# Exception register.
+#
+# The only sanctioned way to run out of compliance with a validator rule.
+# An exception downgrades a specific CI error to a warning, for a specific
+# spec (or registry file), until it expires. Informal workarounds — editing
+# the validator, restructuring to dodge a check — are governance tampering
+# (SECURITY.md threat #4).
+#
+# Rules (validated by scripts/validate.py):
+#   - every entry: id, target, code, reason, approved_by, granted, expires
+#   - approved_by must name the security/identity owner or the shared
+#     services maintainer (a human handle; approving your own exception for
+#     a spec you own defeats the point — reviewers check this on the PR)
+#   - expires is mandatory, max 90 days out from granted; an expired entry
+#     is a CI error until removed or consciously renewed by PR
+#   - non-waivable codes (GE-FROZEN-WRITE, GE-SELF-APPROVE) are rejected
+#   - an exception matching no current error is flagged so the register
+#     stays clean
+#
+# target: the spec's `name` from its frontmatter, or a registry path like
+#   "registry/agents.yaml" for registry-level rules.
+# code:   the GE-* code printed with the CI error being waived.
+#
+# Example entry:
+#   - id: EX-2026-001
+#     target: weekly-release-review
+#     code: GE-CRED-STANDING
+#     reason: >
+#       Notes-page host has no OIDC support; standing token scoped to one
+#       page, rotated weekly by hand while we migrate hosts.
+#     approved_by: [security-owner]
+#     granted: 2026-08-20
+#     expires: 2026-10-01
+
+exceptions: []

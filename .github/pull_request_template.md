@@ -16,6 +16,12 @@ For a new or changed GRAPH SPEC:
 - [ ] Side-effect nodes have idempotency keys derived from `(run_id, step_id)`
 - [ ] Cost cap and alert threshold are set and defensible
 
+Security (all PRs):
+
+- [ ] No secrets, tokens, or credential material anywhere in the diff (registries describe credentials, never contain them)
+- [ ] No weakening of `scripts/validate.py`, CI, or CODEOWNERS without security-owner review
+- [ ] Any new exception in `governance/exceptions.yaml` has a reason, a named approver, and an expiry ≤ 90 days
+
 For an autonomy increase (gate removed, cap widened, sampling enabled):
 
 - [ ] Anchor coverage demonstrated (external anchors from the team's anchor table, outcomes in run records)
