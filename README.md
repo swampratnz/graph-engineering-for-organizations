@@ -40,6 +40,7 @@ ownership — is declared in versioned files here and checked by CI on every PR.
 | [`AGENTS.md`](AGENTS.md) | **Instructions for AI agents**: ground rules for working here, plus the step-by-step playbook for deploying this repo in an organization |
 | [`SECURITY.md`](SECURITY.md) | Threat model, reporting paths, non-waivable rules |
 | [`docs/plan.md`](docs/plan.md) | The canonical implementation plan |
+| [`docs/practical-guide-design.md`](docs/practical-guide-design.md) | Decision record: research-backed design for the practical-guide layer (primer, tutorial, size-segmented adoption paths) |
 | [`docs/walkthrough.md`](docs/walkthrough.md) | Plain-language tour: a small team using this on a live repo |
 | [`docs/implementation-examples.md`](docs/implementation-examples.md) | Concrete runtimes: ticket-based, LangGraph, Temporal; sampling mechanics; CI wiring |
 | [`docs/rollout-checklist.md`](docs/rollout-checklist.md) | Phase gates as checkable state, updated by PR |
