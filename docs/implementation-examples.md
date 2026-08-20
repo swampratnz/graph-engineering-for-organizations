@@ -5,6 +5,42 @@ these are interchangeable engines under it — chosen in order of pragmatism
 (`docs/plan.md`, Phase 2), and you should not move down the list until the
 current level has failed for a stated, written reason.
 
+## Choosing a runtime
+
+| Start here if… | Runtime | Move on only when |
+|----------------|---------|-------------------|
+| Always — any team size, no infrastructure | **Ticket-based state** (§1) | You need programmatic branching/state the issue tracker can't express, *written down as the reason* |
+| Graphs need code: conditional edges, retries, structured state | **LangGraph + checkpointer** (§2) | Runs must survive worker crashes and multi-day waits at scale |
+| Durability is the product requirement | **Temporal underneath** (§3) | — |
+
+A reference implementation of the ticket runtime's record lifecycle
+ships in this repo: `python3 scripts/ticket_runner.py --help` (start a
+run, record gate decisions, close with a schema-valid run record) — use
+it to execute the tutorial's manual run, or as the seed of your own
+resume job.
+
+## Runtime crosswalk
+
+The gate contract (pause, structured human decision, timeout behavior,
+resume) maps onto every major engine's primitive — adopt the spec layer
+without changing engines:
+
+| Engine | Gate/pause primitive | Durable state | Timeout handling |
+|--------|---------------------|---------------|------------------|
+| Ticket system (GitHub/Jira/Linear) | Assigned child issue + `/approve\|/reject\|/modify` reply | The issue thread | Scheduler watches open gates; applies spec's `on_timeout` |
+| LangGraph | `interrupt()` at the gate node | Checkpointer (e.g. Postgres) | External scheduler resumes with `on_timeout` result |
+| Temporal | Signal + `workflow.wait_condition(timeout=…)` | Event-sourced history | Native — timeout falls out of `wait_condition` |
+| AWS Step Functions | `waitForTaskToken` callback | Execution state | State-machine timeout on the wait state |
+| Microsoft Agent Framework | Workflow checkpoint + HITL approval | Checkpoint store | Framework timeout + resume |
+| OpenAI Agents SDK | Tool-approval interrupts | Session/state store | Caller-managed |
+| Claude Agent SDK | Permission callbacks (model asks) + hooks (deterministic gates that don't ask the model) | Session + your store | Caller-managed |
+| GitHub Agentic Workflows / Actions | PR review or environment approval as the gate; "safe outputs" only | The PR/issue itself | Environment wait timers; branch protection |
+
+Whatever the engine: the reviewer's decision is recorded per
+`schemas/gate-decision.schema.json`, the run per
+`schemas/run-record.schema.json` — identical records across engines is
+what keeps override-rate and audit queries computable when you migrate.
+
 ## 1. Ticket-based state (start here)
 
 No new infrastructure: your ticket system is the state store, the gate

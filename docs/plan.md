@@ -4,6 +4,10 @@ Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph work
 
 ## What the research says (condensed)
 
+Each numbered claim is sourced, or explicitly labeled a planning
+assumption, in [Sources](#sources-for-the-research-claims) at the end of
+this document.
+
 1. **The adoption gap is organizational, not technical.** Most organizations are experimenting with agents; a minority are scaling them. The failures cluster around governance gaps, cost control, and integration, not model capability.
 2. **Human review capacity is the binding constraint on fleet size.** Field estimates: an operator with no purpose-built surface manages 2-3 agents before situational awareness breaks; with a proper operator surface (kanban, run registry, alerting) that rises to 10-20. Plan headcount around review capacity, not agent count.
 3. **Durable execution is the load-bearing primitive.** The converged pattern: persist state at every node boundary, pause at human gates via an interrupt/signal mechanism, resume from exact state hours or days later, survive process death while waiting. LangGraph (interrupt + checkpointer) and Temporal (signals + event sourcing) are the reference implementations; production teams increasingly run both (LangGraph for reasoning, Temporal for durability). Session memory is not durable execution: chat history doesn't prove which side effect ran or whether a retry would duplicate it.
@@ -106,3 +110,58 @@ If gate latency blows out or override rate sits at zero, the finding is that the
 - No org-wide rollout before one pilot has produced four weeks of gate metrics
 - No shared multi-owner graphs for work that personal graphs with output contracts can serve
 - No autonomy increases justified by internal metrics alone
+
+## Sources for the research claims
+
+Retrofitted 2026-08 (see `docs/practical-guide-design.md` §8.5): claims
+above are either cited here or labeled planning assumptions. Vendor
+numbers flagged [vendor].
+
+1. **Adoption gap is organizational** — Gartner, [>40% of agentic
+   projects canceled by end-2027 over costs/value/risk
+   controls](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027)
+   (Jun 2025); McKinsey State of AI (Nov 2025): 23% scaling agents, 39%
+   experimenting; MIT NANDA (Aug 2025, methodology contested): ~95% of
+   pilots without P&L impact, attributed to adoption mismanagement.
+2. **Review capacity as binding constraint** — the 2-3 / 10-20
+   supervised-agent figures are **planning assumptions**, not measured
+   results; treat them as defaults to re-baseline against your own
+   review-load metric (`metrics/gate-health.md` §6). Published support
+   for the direction: approval-arithmetic analyses
+   ([oversight-fatigue](https://hackernoon.com/the-oversight-fatigue-problem-why-hitl-breaks-down-at-scale-and-what-comes-after)),
+   a documented [99.7%-by-day-3 approval-rate
+   case](https://aipatternbook.com/approval-fatigue), and 59.8% of
+   builders relying on human review
+   ([LangChain, Dec 2025](https://www.langchain.com/state-of-agent-engineering)).
+3. **Durable execution** — [LangGraph
+   `interrupt()`/checkpointer](https://www.langchain.com/blog/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt)
+   and [Temporal signals/event
+   sourcing](https://temporal.io/blog/announcing-openai-agents-sdk-integration)
+   as reference implementations.
+4. **Idempotency** — standard durable-execution practice (Temporal
+   activity semantics); stated here as a design rule.
+5. **Distribution via plugins** — product capability of the Claude
+   stack; verify against current vendor docs at adoption time [vendor].
+6. **Agent identity gap** — [OWASP Non-Human Identities Top
+   10](https://owasp.org/www-project-non-human-identities-top-10/)
+   (2025); [Microsoft Entra Agent
+   ID](https://learn.microsoft.com/en-us/entra/agent-id/) (JIT,
+   no-standing-credential agent identities, GA 2026); the
+   Salesloft-Drift breach as the canonical failure pattern.
+7. **Regulation** — [EU AI Act Article 14 (human oversight, safe
+   interrupt)](https://artificialintelligenceact.eu/article/14/); GPAI
+   obligations live Aug 2025; high-risk obligations postponed to Dec
+   2027 / Aug 2028 by the mid-2026 Digital Omnibus
+   ([analysis](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/))
+   — re-verify dates before relying on them.
+8. **Multi-agent pathologies** — cataloged in [OWASP's agentic threat
+   corpus](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/)
+   (cascading failures, HITL flooding); sycophancy-cascade and
+   non-convergence specifics are **planning assumptions** drawn from the
+   multi-agent literature — the guards (round caps, group ceilings,
+   fresh-context verifiers) are cheap regardless.
+9. **Selective validation works** — tiered/risk-based oversight with
+   sampled review as converging practice
+   ([CSA autonomy levels, Jan 2026](https://cloudsecurityalliance.org/blog/2026/01/28/levels-of-autonomy));
+   high automation rates with exception-routing are widely reported by
+   platform vendors [vendor].
