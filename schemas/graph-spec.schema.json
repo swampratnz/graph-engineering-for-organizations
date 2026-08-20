@@ -10,9 +10,9 @@
     "spec": { "const": "graph/v1" },
     "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "status": { "enum": ["draft", "pilot", "promoted", "deprecated", "killed"] },
-    "team": { "type": "string" },
-    "owner": { "type": "string", "description": "The Workflow DRI. Exactly one person." },
-    "backup_owner": { "type": "string" },
+    "team": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "owner": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "The Workflow DRI. Exactly one person. Lowercase: GitHub handles are case-insensitive, and mixed case here would dodge identity comparisons." },
+    "backup_owner": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
     "created": { "type": "string", "format": "date" },
     "review_by": { "type": "string", "format": "date", "description": "Quarterly. Past date = orphaned spec = CI failure for pilot/promoted specs." },
     "shape": { "enum": ["personal", "shared"] },
@@ -35,7 +35,8 @@
       "additionalProperties": false,
       "properties": {
         "cap_per_run_usd": { "type": "number", "exclusiveMinimum": 0 },
-        "alert_threshold_usd": { "type": "number", "exclusiveMinimum": 0 }
+        "alert_threshold_usd": { "type": "number", "exclusiveMinimum": 0 },
+        "cap_per_day_usd": { "type": "number", "exclusiveMinimum": 0, "description": "Optional aggregate ceiling: bounds many-runs-under-cap (cron storms, retry loops). Must be >= cap_per_run_usd." }
       }
     },
     "resources": {
@@ -57,10 +58,10 @@
           "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
           "class": { "enum": ["irreversible", "external", "quality"] },
           "surface": { "enum": ["pr", "chat", "ticket"] },
-          "reviewers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "reviewers": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" } },
           "timeout_hours": { "type": "number", "exclusiveMinimum": 0 },
           "on_timeout": { "enum": ["escalate", "default_deny", "reroute"] },
-          "escalate_to": { "type": "string" }
+          "escalate_to": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" }
         }
       }
     },

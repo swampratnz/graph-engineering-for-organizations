@@ -37,6 +37,13 @@ translate equivalents for GitLab/Bitbucket.
   hand-editing under pressure.
 - [ ] No workflow in this repo uses `pull_request_target` with checkout of
   PR code. Keep it that way.
+- [ ] **Scheduled-run keepalive.** GitHub disables scheduled workflows after
+  ~60 days of repository inactivity — and the weekly validate run is the
+  control that surfaces orphaned specs and lapsed recertifications on
+  exactly the low-traffic repos that need it. Pick one: an external pinger
+  hitting the workflow's `workflow_dispatch` (calendar-driven), or a
+  standing calendar entry for the security owner to confirm monthly that
+  the schedule is still enabled. Write down which.
 - [ ] Repository/org secrets: this repo needs **none**. An added secret is a
   finding — the validator and CI run on public repo content only.
 

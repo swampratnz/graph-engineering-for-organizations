@@ -40,6 +40,11 @@ start a phase before the previous phase's exit criteria are checked.
 - [ ] Chat notifications for pending gates with structured
       approve/reject/modify responses
 - [ ] Run records logged per `schemas/run-record.schema.json`
+- [ ] Metrics tooling exists: something (a script, a saved query, a
+      spreadsheet fed from ticket exports) actually computes the
+      `metrics/gate-health.md` numbers from run data — the success gate
+      below depends on four of them, and prose definitions don't
+      compute themselves
 - [ ] Four weeks of pilot metrics collected
 
 **Pilot success gate (required before further Phase 2 investment):**
@@ -63,6 +68,18 @@ more orchestration infrastructure.
 - [ ] Pathology guards enforced as platform defaults, not per-spec opt-ins
 - [ ] First quarterly spec review completed
       (`docs/runbooks/quarterly-spec-review.md`)
+
+## Phase 3+ backlog (scheduled, not started)
+
+- [ ] **Registry-vs-reality reconciliation job.** The registries document
+      intent; IAM enforces it — and nothing yet detects drift between the
+      two (an agent deleted here but alive in the identity provider, a
+      frozen instrument that quietly regained a writer, a standing PAT
+      behind a `kind: jit` entry). A scheduled job diffing actual
+      identities and instrument IAM against `registry/*.yaml` is the
+      highest-value automation after the pilot; until it exists, the
+      quarterly review's manual attestation is the only control, and that
+      is a known gap, not a guarantee.
 
 ## Escalation triggers for heavier runtimes
 

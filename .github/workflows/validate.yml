@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Manual trigger: also the keepalive path — GitHub disables scheduled
+  # workflows after ~60 days of repo inactivity, and a governance repo in
+  # steady state is exactly a low-traffic repo. See docs/platform-hardening.md.
+  workflow_dispatch:
   schedule:
     # Weekly, so orphaned specs, lapsed agent recertifications, and expired
     # exceptions surface even with no PR traffic.

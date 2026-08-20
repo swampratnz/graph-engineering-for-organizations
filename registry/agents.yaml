@@ -31,3 +31,17 @@ agents:
     kill_switch:
       how: "Set status: disabled here; revoke the OIDC trust binding"
       authorized: [security-owner, alice]
+
+  - id: example-triage-bot
+    owner: bob
+    created: 2026-05-10
+    review_by: 2026-11-20
+    status: active
+    purpose: Runs the dependency-update-triage graph for example-team.
+    credentials:
+      kind: jit
+      scope: "repo:example/acme-app contents+pulls write; telemetry read-only"
+      issued_via: "Per-agent GitHub App installation token, 1h TTL"
+    kill_switch:
+      how: "Set status: disabled here; suspend the App installation"
+      authorized: [security-owner, bob]
