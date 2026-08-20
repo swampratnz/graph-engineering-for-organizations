@@ -1,6 +1,6 @@
 # Anchor table — <team>
 
-One page per team (or portfolio company). Objectives are what graphs
+One page per team (or business unit). Objectives are what graphs
 optimize; anchors are the external signals used to verify them. This table
 sets the autonomy ceiling for every workflow the team runs: a workflow may
 only claim `anchor_class: external` for anchors listed here.
