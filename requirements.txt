@@ -1,4 +1,4 @@
 # Pinned dependencies for scripts/validate.py. Raised by Dependabot PR
 # (.github/dependabot.yml), reviewed like any other change.
-pyyaml==6.0.1
+pyyaml==6.0.3
 jsonschema==4.26.0
