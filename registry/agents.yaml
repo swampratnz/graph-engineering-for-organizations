@@ -45,3 +45,17 @@ agents:
     kill_switch:
       how: "Set status: disabled here; suspend the App installation"
       authorized: [security-owner, bob]
+
+  - id: example-explainer-bot
+    owner: dana
+    created: 2026-08-20
+    review_by: 2026-11-20
+    status: active
+    purpose: Runs the ci-failure-explainer graph for example-team (suggest-only).
+    credentials:
+      kind: jit
+      scope: "repo:example/acme-app checks+actions-logs read; issues comment write"
+      issued_via: "Per-agent GitHub App installation token, 1h TTL"
+    kill_switch:
+      how: "Set status: disabled here; suspend the App installation"
+      authorized: [security-owner, dana]

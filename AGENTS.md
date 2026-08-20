@@ -63,6 +63,15 @@ organization has; do not invent org facts.
 
 Collect from the humans:
 
+- **Org size and path.** How many people will operate this? Calibrate
+  scope to the matching path — `docs/paths/small-team.md` (2-10) or
+  `docs/paths/enterprise.md` — before demanding artifacts. At small
+  scale, much machinery is deliberately dormant: do not require an
+  anchor table, plugin library, or metrics tooling on day one (the
+  small-team path lists what defers and what wakes it), and check the
+  separation-of-duties math for their headcount against that path's
+  table (at 2 people, the backup-reviews exception needs an *outside*
+  approver — surface that early, not at PR time).
 - Org and team names; the ticket system (GitHub Issues/Projects, Jira, ...).
 - The people for the three roles in `governance/decision-rights.md`:
   security/identity owner, shared services maintainer, and at least one

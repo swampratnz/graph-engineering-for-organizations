@@ -36,3 +36,11 @@ resources:
     description: >
       Support ticket tagging (support-owned). Measurement instrument for the
       customer-found-incidents anchor.
+
+  - id: repo.issue-comments
+    kind: api
+    owner: dana
+    frozen: false
+    description: >
+      Issue/PR comment surface of the main application repository.
+      Suggest-only output channel: internally visible, low blast radius.
