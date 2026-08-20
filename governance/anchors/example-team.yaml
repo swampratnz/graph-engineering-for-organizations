@@ -1,0 +1,11 @@
+# Machine-readable anchor table for example-team; prose companion in
+# example-team.md. See TEMPLATE.yaml for the rules CI enforces.
+
+team: example-team
+anchors:
+  - id: customer-found-incidents
+    instrument: support.ticket-tags
+    latency: continuous
+  - id: release-rollback-rate
+    instrument: telemetry.release-health
+    latency: per-release

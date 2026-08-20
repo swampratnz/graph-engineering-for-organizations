@@ -4,7 +4,7 @@ name: weekly-release-review
 status: pilot
 team: example-team
 owner: alice
-backup_owner: bob
+backup_owner: dana
 created: 2026-08-20
 review_by: 2026-11-20
 
@@ -32,14 +32,14 @@ gates:
   - id: release-go-no-go
     class: external
     surface: ticket
-    reviewers: [bob, carol]
+    reviewers: [bob]
     timeout_hours: 24
     on_timeout: escalate
     escalate_to: carol
   - id: notes-quality
     class: quality
     surface: pr
-    reviewers: [dana]
+    reviewers: [carol]
     timeout_hours: 48
     on_timeout: default_deny
 
@@ -98,11 +98,16 @@ Side-effect nodes and idempotency:
 
 - **release-go-no-go** — Input: the release summary artifact (changes, risk
   callouts, current telemetry snapshot). Output: structured
-  approve/reject/modify + reason. Timeout: 24h then escalate to carol.
-  Resolved as a child issue on the run's parent issue.
+  approve/reject/modify + reason. Reviewer: bob; timeout 24h then escalate
+  to carol. Resolved as a child issue on the run's parent issue.
 - **notes-quality** — Input: the draft notes as a PR diff against the notes
-  page. Output: PR review mapped to approve/reject/modify. Timeout: 48h then
-  default-deny (notes ship the following week instead).
+  page. Output: PR review mapped to approve/reject/modify. Reviewer: carol;
+  timeout 48h then default-deny (notes ship the following week instead).
+
+Note the separation math for a four-person team: alice owns, dana is backup,
+so bob and carol hold the gates — neither the owner nor the backup reviews
+anything this graph produces (CI enforces both; the backup rule is waivable
+by exception for smaller teams, the owner rule is not).
 
 ## Audit
 

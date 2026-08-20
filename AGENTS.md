@@ -93,9 +93,13 @@ Collect from the humans:
 
 ### Phase C — Foundations (mirrors Phase 0 of `docs/plan.md`)
 
-1. **Anchor table:** copy `governance/anchors/TEMPLATE.md` to
-   `governance/anchors/<team>.md` and fill it from Phase A facts. The
-   humans confirm the anchors are actually externally measured.
+1. **Anchor table:** copy `governance/anchors/TEMPLATE.md` (prose) and
+   `governance/anchors/TEMPLATE.yaml` (the machine-readable source CI
+   enforces) to `governance/anchors/<team>.md` / `<team>.yaml` and fill
+   them from Phase A facts. Every anchor's instrument must be registered
+   in `registry/resources.yaml` with `frozen: true` — CI checks this, and
+   specs can only claim anchor ids the yaml defines. The humans confirm
+   the anchors are actually externally measured.
 2. **Frozen instruments:** add each measurement system to
    `registry/resources.yaml` with `frozen: true`. Separately instruct the
    humans to *actually revoke* write access in the real system — the

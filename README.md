@@ -47,13 +47,21 @@ build when:
 - a spec writes a **frozen** resource (measurement instruments are frozen)
 - two active specs write the same resource (they need an edge, not
   parallelism)
-- a gate lacks a timeout behavior, or escalation names no one
+- a gate lacks a timeout behavior, or escalation names no one, targets the
+  owner/backup, or targets someone already reviewing that gate
 - a spec's **owner reviews their own gates** or is their escalation target
-  (separation of duties)
-- the owner and backup owner are the same person, or a governance role is
-  held by an agent identity instead of a human
+  (separation of duties, non-waivable); the **backup owner** likewise
+  (waivable by exception for small teams)
+- the owner and backup owner are the same person, or a governance role —
+  including kill-switch authorization — is held by an agent identity
+  instead of a human (all handle comparisons are case-insensitive, and the
+  schema requires lowercase handles)
 - sampling oversight is claimed without external anchors — internal metrics
   never justify autonomy
+- a claimed external anchor isn't in the team's machine-readable anchor
+  table (`governance/anchors/<team>.yaml`), or its measuring instrument
+  isn't registered and frozen
+- an exception was approved by the target spec's own owner or backup
 - the cost alert threshold isn't below the hard cap
 - an active spec is past its `review_by` date (orphaned — ownership decay is
   the org-layer silent node failure)

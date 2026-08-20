@@ -2,7 +2,8 @@
 
 Reference table backing the example pilot spec
 (`specs/example-team/weekly-release-review.md`). Replace with your own team's
-table, copied from `TEMPLATE.md`.
+table, copied from `TEMPLATE.md`. The machine-readable source CI enforces is
+the sibling `example-team.yaml`.
 
 Owner: alice · Reviewed: 2026-08-20 · Next review: 2026-11-20
 

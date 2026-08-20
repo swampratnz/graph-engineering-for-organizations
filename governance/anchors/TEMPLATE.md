@@ -5,6 +5,11 @@ optimize; anchors are the external signals used to verify them. This table
 sets the autonomy ceiling for every workflow the team runs: a workflow may
 only claim `anchor_class: external` for anchors listed here.
 
+This `.md` file is the prose (objectives, rationale, ceilings); the sibling
+`<team>.yaml` (copy `TEMPLATE.yaml`) is the machine-readable source CI
+enforces — spec anchors must exist there, and each anchor's instrument must
+be registered and frozen. Keep the two in the same PR when they change.
+
 Owner: <name> · Reviewed: <date> · Next review: <date, quarterly>
 
 ## Objectives
