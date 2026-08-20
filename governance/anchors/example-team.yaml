@@ -9,3 +9,6 @@ anchors:
   - id: release-rollback-rate
     instrument: telemetry.release-health
     latency: per-release
+  - id: dependency-regression-rate
+    instrument: telemetry.release-health
+    latency: per-release

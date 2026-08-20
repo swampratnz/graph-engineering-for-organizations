@@ -15,6 +15,24 @@ autonomy scales with external anchor density, never with internal metrics.
 Everything that enforces this — identity, gates, costs, frozen instruments,
 ownership — is declared in versioned files here and checked by CI on every PR.
 
+## New here? Three ways in
+
+1. **See it used:** [`docs/walkthrough.md`](docs/walkthrough.md) — a
+   three-person team putting one agent workflow under governance on a live
+   repo, start to finish.
+2. **Read the two reference specs**, which bracket the autonomy spectrum:
+   [`weekly-release-review`](specs/example-team/weekly-release-review.md)
+   (shared graph, every run human-gated) and
+   [`dependency-update-triage`](specs/example-team/dependency-update-triage.md)
+   (personal graph that *earned* 15% sampling oversight through four weeks
+   of gate metrics and an external anchor — with 100% review kept on the
+   irreversible step, and the promotion paper trail in the file).
+3. **See how it runs:**
+   [`docs/implementation-examples.md`](docs/implementation-examples.md) —
+   the same gate contract on ticket-based state (no infrastructure),
+   LangGraph, and Temporal, plus how sampling draws and how to wire the
+   validator into any CI.
+
 ## Layout
 
 | Path | What it is |
@@ -22,10 +40,12 @@ ownership — is declared in versioned files here and checked by CI on every PR.
 | [`AGENTS.md`](AGENTS.md) | **Instructions for AI agents**: ground rules for working here, plus the step-by-step playbook for deploying this repo in an organization |
 | [`SECURITY.md`](SECURITY.md) | Threat model, reporting paths, non-waivable rules |
 | [`docs/plan.md`](docs/plan.md) | The canonical implementation plan |
+| [`docs/walkthrough.md`](docs/walkthrough.md) | Plain-language tour: a small team using this on a live repo |
+| [`docs/implementation-examples.md`](docs/implementation-examples.md) | Concrete runtimes: ticket-based, LangGraph, Temporal; sampling mechanics; CI wiring |
 | [`docs/rollout-checklist.md`](docs/rollout-checklist.md) | Phase gates as checkable state, updated by PR |
 | [`docs/platform-hardening.md`](docs/platform-hardening.md) | Branch protection, CI token scopes, credential issuance, frozen-instrument IAM — the platform settings that make the rules enforceable |
 | [`docs/runbooks/`](docs/runbooks/) | Kill switch, incident response, quarterly spec review |
-| [`specs/`](specs/) | GRAPH SPECs — one per workflow, YAML frontmatter + prose ([template](specs/TEMPLATE.md), [reference example](specs/example-team/weekly-release-review.md)) |
+| [`specs/`](specs/) | GRAPH SPECs — one per workflow, YAML frontmatter + prose ([template](specs/TEMPLATE.md); reference examples: [full gating](specs/example-team/weekly-release-review.md), [earned sampling](specs/example-team/dependency-update-triage.md)) |
 | [`registry/agents.yaml`](registry/agents.yaml) | Agent identity registry: owner, JIT credentials, kill switch, recertification date per agent |
 | [`registry/resources.yaml`](registry/resources.yaml) | Shared resource registry, incl. frozen measurement instruments |
 | [`governance/`](governance/) | [Decision rights](governance/decision-rights.md), per-team [anchor tables](governance/anchors/TEMPLATE.md), [exception register](governance/exceptions.yaml), [compliance mapping](governance/compliance-mapping.md) |
