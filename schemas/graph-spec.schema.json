@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "graph-engineering/graph-spec",
+  "title": "GRAPH SPEC frontmatter",
+  "description": "Schema for the YAML frontmatter of every file under specs/. scripts/validate.py enforces this plus the cross-file rules (agents exist and are active, resources exist and frozen ones aren't written, owner not a reviewer, write contention, orphan dates).",
+  "type": "object",
+  "required": ["spec", "name", "status", "team", "owner", "backup_owner", "created", "review_by", "shape", "runtime", "agents", "autonomy", "cost", "resources", "gates", "pathology_guards", "kill_switch"],
+  "additionalProperties": false,
+  "properties": {
+    "spec": { "const": "graph/v1" },
+    "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "status": { "enum": ["draft", "pilot", "promoted", "deprecated", "killed"] },
+    "team": { "type": "string" },
+    "owner": { "type": "string", "description": "The Workflow DRI. Exactly one person." },
+    "backup_owner": { "type": "string" },
+    "created": { "type": "string", "format": "date" },
+    "review_by": { "type": "string", "format": "date", "description": "Quarterly. Past date = orphaned spec = CI failure for pilot/promoted specs." },
+    "shape": { "enum": ["personal", "shared"] },
+    "runtime": { "enum": ["ticket", "langgraph", "temporal", "claude-workflow"] },
+    "agents": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "autonomy": {
+      "type": "object",
+      "required": ["anchor_class", "anchors", "oversight"],
+      "additionalProperties": false,
+      "properties": {
+        "anchor_class": { "enum": ["external", "internal"] },
+        "anchors": { "type": "array", "items": { "type": "string" } },
+        "oversight": { "enum": ["full-gating", "sampling"] },
+        "sampling_rate": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "required": ["cap_per_run_usd", "alert_threshold_usd"],
+      "additionalProperties": false,
+      "properties": {
+        "cap_per_run_usd": { "type": "number", "exclusiveMinimum": 0 },
+        "alert_threshold_usd": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "required": ["reads", "writes"],
+      "additionalProperties": false,
+      "properties": {
+        "reads": { "type": "array", "items": { "type": "string" } },
+        "writes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "surface", "reviewers", "timeout_hours", "on_timeout"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "class": { "enum": ["irreversible", "external", "quality"] },
+          "surface": { "enum": ["pr", "chat", "ticket"] },
+          "reviewers": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "timeout_hours": { "type": "number", "exclusiveMinimum": 0 },
+          "on_timeout": { "enum": ["escalate", "default_deny", "reroute"] },
+          "escalate_to": { "type": "string" }
+        }
+      }
+    },
+    "pathology_guards": {
+      "type": "object",
+      "required": ["max_debate_rounds", "max_agent_group", "fresh_context_verifier", "arbitration_default"],
+      "additionalProperties": false,
+      "properties": {
+        "max_debate_rounds": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "max_agent_group": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "fresh_context_verifier": { "const": true },
+        "arbitration_default": { "enum": ["reject", "escalate", "accept-baseline"] }
+      }
+    },
+    "kill_switch": {
+      "type": "object",
+      "required": ["how", "authorized"],
+      "additionalProperties": false,
+      "properties": {
+        "how": { "type": "string", "minLength": 10 },
+        "authorized": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "graph-engineering/gate-decision",
+  "title": "Gate decision",
+  "description": "Structured output of a human node. Every gate resolution produces one of these; it feeds the audit plane. Free-text approval without a reason is not a resolution.",
+  "type": "object",
+  "required": ["run_id", "gate_id", "decision", "reason", "decided_by", "decided_at"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": { "type": "string", "description": "The run this gate belongs to." },
+    "gate_id": { "type": "string", "description": "Gate id from the spec frontmatter." },
+    "decision": { "enum": ["approve", "reject", "modify"] },
+    "reason": { "type": "string", "minLength": 1, "description": "Why. Required for every decision, including approve — this is what makes override-rate and rubber-stamp metrics computable." },
+    "modification": { "type": "string", "description": "Required when decision is modify: what was changed before proceeding." },
+    "decided_by": { "type": "string", "description": "Human identity that resolved the gate. Must be an authorized reviewer for this gate class; must not be the spec owner." },
+    "decided_at": { "type": "string", "format": "date-time" },
+    "escalated_from": { "type": "string", "description": "Set when this resolution came from a timeout escalation; the originally assigned reviewer." },
+    "timed_out": { "type": "boolean", "description": "True when the gate resolved via its timeout behavior (default_deny / reroute) rather than a human decision." }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "modify" } } },
+      "then": { "required": ["modification"] }
+    }
+  ]
+}

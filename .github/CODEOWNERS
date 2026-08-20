@@ -1,0 +1,19 @@
+# Review routing per governance/decision-rights.md.
+# Replace the placeholder handles with real ones when staffing the roles.
+
+# Security/identity owner: agent registry, credential lifecycle, frozen instruments
+/registry/            @swampratnz
+
+# Shared services maintainer: platform defaults, templates, validator, shared workflows
+/schemas/             @swampratnz
+/scripts/             @swampratnz
+/workflows/           @swampratnz
+/specs/TEMPLATE.md    @swampratnz
+
+# Governance changes are chairman/leadership-level review
+/governance/          @swampratnz
+/docs/plan.md         @swampratnz
+
+# Individual specs are owned by their frontmatter `owner`; CODEOWNERS can't
+# express per-file YAML, so add per-team lines here as teams onboard, e.g.:
+# /specs/example-team/  @alice

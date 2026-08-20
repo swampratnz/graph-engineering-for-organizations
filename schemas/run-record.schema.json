@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "graph-engineering/run-record",
+  "title": "Run record",
+  "description": "Immutable per-run audit record: nodes executed, models used, gates resolved (by whom, when, why), spend, and anchor outcomes. Written append-only; aligns with EU AI Act high-risk audit requirements. Cheap now, expensive to retrofit.",
+  "type": "object",
+  "required": ["run_id", "spec", "spec_version", "agents", "started_at", "status", "nodes", "gates", "spend_usd"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": { "type": "string" },
+    "spec": { "type": "string", "description": "Spec name from frontmatter." },
+    "spec_version": { "type": "string", "description": "Git SHA of the spec revision this run executed." },
+    "agents": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Agent identities (registry/agents.yaml ids) that acted in this run."
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["running", "waiting_on_gate", "completed", "rejected", "failed", "killed", "cap_exceeded"] },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_id", "kind", "started_at"],
+        "additionalProperties": false,
+        "properties": {
+          "step_id": { "type": "string" },
+          "kind": { "enum": ["agent", "gate", "system"] },
+          "model": { "type": "string", "description": "Model id, for agent nodes." },
+          "started_at": { "type": "string", "format": "date-time" },
+          "finished_at": { "type": "string", "format": "date-time" },
+          "idempotency_key": { "type": "string", "description": "For side-effect nodes: derived from (run_id, step_id)." },
+          "retries": { "type": "integer", "minimum": 0 },
+          "spend_usd": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": { "$ref": "gate-decision.schema.json" }
+    },
+    "spend_usd": { "type": "number", "minimum": 0, "description": "Total run spend. Must never exceed the spec's cap_per_run_usd; a run stopped at cap gets status cap_exceeded." },
+    "anchor_outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["anchor", "measured_at"],
+        "additionalProperties": false,
+        "properties": {
+          "anchor": { "type": "string", "description": "Anchor id from the team's anchor table." },
+          "value": { "description": "The externally measured value, whatever its type." },
+          "measured_at": { "type": "string", "format": "date-time" },
+          "source": { "type": "string", "description": "The frozen instrument or third party that produced the value." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# Agent identity registry.
+#
+# Every agent identity that runs a graph in this org gets an entry here BEFORE
+# it gets credentials. Rules (validated by scripts/validate.py):
+#   - unique id; no shared credentials; agents never impersonate humans
+#   - named human owner (a person, not a team alias)
+#   - credentials are scoped and just-in-time; document how they're issued
+#   - a working kill switch, and who may pull it
+#   - specs may only reference agents listed here with status: active
+#
+# Lifecycle: active -> disabled (kill switch pulled; no approval needed)
+#                   -> retired (credentials destroyed; kept for audit history)
+# Restarting a disabled agent requires approval per governance/decision-rights.md.
+
+agents:
+  - id: example-release-bot
+    owner: alice
+    created: 2026-08-20
+    status: active
+    purpose: Runs the weekly-release-review graph for example-team.
+    credentials:
+      kind: jit
+      scope: "repo:example/notes-page write; telemetry read-only"
+      issued_via: "CI OIDC exchange, 1h TTL, no standing secrets"
+    kill_switch:
+      how: "Set status: disabled here; revoke the OIDC trust binding"
+      authorized: [security-owner, alice]

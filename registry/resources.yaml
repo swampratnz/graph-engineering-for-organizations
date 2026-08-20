@@ -1,0 +1,30 @@
+# Shared resource registry.
+#
+# Every table, API, file, or page a graph reads or writes gets an entry here.
+# Rules (validated by scripts/validate.py):
+#   - specs may only declare resources listed here
+#   - frozen: true marks a measurement instrument. No spec may declare a write
+#     on a frozen resource — no optimizing agent (or team being measured) holds
+#     write access to the instruments that measure it.
+#   - two active specs writing the same resource are flagged: two nodes writing
+#     the same resource need an edge, not parallelism. Build the edge (or merge
+#     the specs) before the first collision.
+
+resources:
+  - id: repo.main
+    kind: repo
+    owner: alice
+    frozen: false
+    description: Main application repository (read-only for release review).
+
+  - id: telemetry.release-health
+    kind: api
+    owner: security-owner
+    frozen: true
+    description: Frozen-config release health telemetry. Measurement instrument.
+
+  - id: release.notes-page
+    kind: file
+    owner: dana
+    frozen: false
+    description: Public release notes page.
