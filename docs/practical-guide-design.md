@@ -1,7 +1,7 @@
 # Design: the practical-guide layer
 
-Status: **proposed** · Prepared: 2026-08-20 · Decision record — keep after
-implementation, like `docs/plan.md`.
+Status: **accepted, v1.1** · Prepared: 2026-08-20 · Amended: 2026-08-20 (§8)
+· Decision record — keep after implementation, like `docs/plan.md`.
 
 This repo set out to be "a practical guide for how engineering teams can get
 started with graph engineering and its benefits." Today it is an excellent
@@ -451,6 +451,15 @@ emitted by `scripts/validate.py` has a row (grep the source for the
 canonical list); crosswalk claims spot-checked against current vendor
 docs.
 
+**PR 4 — Reference runner** (added by amendment, §8): a minimal reference
+implementation of the ticket runtime (`scripts/ticket_runner.py`, no new
+dependencies) that executes a spec's run lifecycle — start a run, record a
+gate decision, complete with a run record — emitting artifacts validated
+against `schemas/gate-decision.schema.json` and
+`schemas/run-record.schema.json`. Acceptance: an end-to-end run of the
+minimal reference spec produces schema-valid records; the GitHub-issues
+wiring stays documented prose in `implementation-examples.md`, not code.
+
 **Backlog** (explicitly not now): `--list-codes` flag on the validator so
 CI can diff `validator-errors.md` against the code (additive; goes
 through normal review since it touches `scripts/`); enabling GitHub's
@@ -540,3 +549,75 @@ Governance · FINOS AI Governance Framework v2 / Governance-as-Code.
 Docs craft: Diátaxis (Procida) · Sequin quickstart case study ·
 API-onboarding TTFC benchmarks · Microsoft Engineering Fundamentals
 Playbook.
+
+---
+
+## 8. Amendment v1.1 (2026-08-20): second-review synthesis
+
+The repository owner solicited an independent review of the repo's
+positioning from a separate session and asked for it to be reconciled with
+this design. Its diagnosis (reference implementation ≠ guide; on-ramp wall;
+uncited claims; term positioning) converges with §2 of this document.
+Beyond the overlap, the following deltas are **adopted**:
+
+1. **LICENSE (blocking adoption bug — the review's best catch).** The repo
+   had no license, making it all-rights-reserved by default and legally
+   contradicting "copy/fork this repo into your org." Resolution: owner
+   selected **Apache-2.0** (explicit patent grant; contributions default to
+   the project license; the norm for adopt-this-framework repos). Ships
+   with this amendment.
+2. **Repo About/topics.** GitHub description and topics were empty, so the
+   synonym strategy (§3.4 primer) never reached GitHub search. These are
+   repository settings, not files — the owner applies them; the
+   implementation PR supplies the exact strings.
+3. **Reference runner (new PR 4, §4).** "The repo never executes a
+   workflow" is fair: specs validate but nothing runs. A ~200-line,
+   dependency-free reference implementation of the ticket runtime makes the
+   contract demonstrably executable without violating the plan's "no
+   bespoke orchestration platform before ticket-based state has failed" —
+   it *is* the ticket-based state, in its simplest form.
+4. **GRC positioning question** added to the enterprise path's buyer
+   questions: "why does this live in a repo instead of our GRC tooling?"
+   (Answer to write: GRC platforms record attestations; this repo *is* the
+   control — the PR gate and validator are the enforcement point, and GRC
+   imports its evidence from here.)
+5. **`docs/plan.md` citation retrofit** (folded into PR 3). The plan's
+   "What the research says" carries uncited field estimates (e.g. "2-3
+   agents per operator; 10-20 with an operator surface"). For a repo whose
+   pitch is auditability, uncited empirical claims undercut the brand:
+   add a sources appendix mapping each claim to the §7 evidence, and
+   soften what cannot be sourced into stated planning assumptions.
+6. **Adopter-first sequencing.** "A framework with one documented
+   deployment beats a polished framework with zero." Adopted as sequencing,
+   not replacement: PRs 1-2 are the runway a first pilot team needs; the
+   tutorial's fresh-reader acceptance test is a micro-pilot; the first
+   real pilot's four weeks of gate metrics become the case study that
+   replaces the fictional walkthrough team (backlog: case studies).
+7. **Positioning line.** The review's sharpest framing — this is *a linter
+   for your agent fleet's governance*, positioned the way OPA/Conftest is
+   for infrastructure — is adopted as README/primer language. Packaging
+   the validator as a standalone installable tool is **deferred to
+   backlog**, gated on external adopter demand: for a repo with zero
+   external adopters, the fork-the-repo model already ships the validator
+   with the files it validates, and productizing first would violate the
+   plan's own "no platform before the simple thing fails" rule.
+
+One recommendation is **declined: validation profiles** (`profile:
+starter` enforcing a subset and warning on the rest). Reasons, recorded so
+the decision isn't relitigated by default: (a) the review's own thesis is
+that the validator's unambiguous red/green is the product — a warn-mostly
+profile dilutes exactly that; (b) the repo already has a relief valve with
+strictly better properties (`governance/exceptions.yaml`: named approver,
+≤90-day expiry, CI-checked), whereas a profile is a standing, unaudited,
+never-expiring exception — the shape `SECURITY.md` threat #4 exists to
+prevent; (c) the wall it targets is Phase-0 *sequencing*, which the
+small-team path fixes by deferral, not relaxation. Revisit only with
+evidence that teams bounce off the validator itself rather than the docs,
+and treat any such change as a validator design change with full review.
+
+Factual corrections to the second review, for the record: it read three
+files — `docs/walkthrough.md` (the "worked walkthrough" it reported
+missing) exists, and its "graph engineering is not an established term"
+predates the term's July 2026 emergence documented in §1.1. Its LICENSE,
+About/topics, runnable-artifact, and adopter-first points stand
+regardless and are adopted above.
