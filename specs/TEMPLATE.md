@@ -6,8 +6,12 @@ spec: graph/v1
 name: my-workflow-name                # kebab-case, unique across specs/
 status: draft                         # draft | pilot | promoted | deprecated | killed
 team: my-team
-owner: github-handle                  # the Workflow DRI. Exactly one.
-backup_owner: github-handle           # escalation target when the owner is unavailable
+owner: github-handle                  # the Workflow DRI. Exactly one. Lowercase —
+                                      # handles are compared case-insensitively and
+                                      # the schema rejects mixed case.
+backup_owner: github-handle           # covers the owner's absence. Not the owner,
+                                      # and (like the owner) never a reviewer or
+                                      # escalation target on this spec's gates.
 created: 2026-08-20
 review_by: 2026-11-20                 # quarterly. A past date marks the spec orphaned and fails CI.
 
@@ -26,9 +30,10 @@ autonomy:
   anchor_class: internal              # external | internal. "external" requires anchors below
                                       # and unlocks sampling oversight; "internal" means tight
                                       # gates regardless of architecture.
-  anchors: []                         # external ground-truth signals from the team's anchor
-                                      # table, e.g. [cash-collected, churn-30d]. Required if
-                                      # anchor_class is external.
+  anchors: []                         # anchor ids from the team's machine-readable anchor
+                                      # table (governance/anchors/<team>.yaml), e.g.
+                                      # [cash-collected, churn-30d]. Required if anchor_class
+                                      # is external; CI rejects ids the table doesn't define.
   oversight: full-gating              # full-gating | sampling. sampling requires
                                       # anchor_class: external AND 4 weeks of gate metrics
                                       # (see governance/decision-rights.md).
@@ -37,6 +42,9 @@ autonomy:
 cost:
   cap_per_run_usd: 5                  # hard cap; the runtime must stop the run at this spend.
   alert_threshold_usd: 3              # anomaly alert to the owner before the cap is hit.
+  # cap_per_day_usd: 25               # optional aggregate ceiling — bounds many runs each
+                                      # under cap (cron storms, retry loops). Must be >= the
+                                      # per-run cap.
 
 resources:                            # every shared resource this graph touches. ids must
   reads: []                           #   exist in registry/resources.yaml.
@@ -52,11 +60,14 @@ gates:                                # every human node. At least one unless st
                                       #   sampling oversight.
     surface: ticket                   # pr | chat | ticket
     reviewers: [github-handle]        # who may resolve this gate. The spec owner is
-                                      #   automatically excluded (separation of duties) —
-                                      #   listing them here fails CI.
+                                      #   excluded (separation of duties, non-waivable);
+                                      #   the backup owner too (waivable by exception for
+                                      #   small teams). Listing either fails CI.
     timeout_hours: 24
     on_timeout: escalate              # escalate | default_deny | reroute
-    escalate_to: github-handle        # required when on_timeout is escalate
+    escalate_to: github-handle        # required when on_timeout is escalate. Not the
+                                      #   owner/backup, and not already a reviewer on
+                                      #   this gate — escalation needs a fresh person.
 
 pathology_guards:
   max_debate_rounds: 3                # cap on any agent-debate pattern

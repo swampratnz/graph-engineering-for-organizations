@@ -1,6 +1,6 @@
 # Graph Engineering for Teams: Organizational Implementation Plan
 
-Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph workflows across an organization with multiple humans interacting. Written generically; BPG-specific notes marked.
+Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph workflows across an organization with multiple humans interacting. Written generically — adopting organizations map the roles and systems named here onto their own.
 
 ## What the research says (condensed)
 
@@ -24,9 +24,9 @@ Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph work
 
 ## Phase 0: Foundations (weeks 0-4)
 
-**Agent identity and registry.** Every agent/workflow gets: unique identity (no shared credentials, no impersonation of humans), named human owner, scoped JIT credentials, kill switch, entry in a central registry. Extend existing IAM/PAM rather than a parallel stack. [BPG: AI Agent IAM Policy v0.2 is the substrate; this phase operationalizes it. Richard owns.]
+**Agent identity and registry.** Every agent/workflow gets: unique identity (no shared credentials, no impersonation of humans), named human owner, scoped JIT credentials, kill switch, entry in a central registry. Extend existing IAM/PAM rather than a parallel stack; if the org already has an AI/agent identity policy, this phase operationalizes it. Named owner: the security/identity owner.
 
-**Anchor definition.** Per team (or portfolio company): a one-page objective/anchor table. Objectives are what graphs optimize; anchors are external signals used to verify (cash landed, churn, customer-found incidents, third-party seeds, frozen-config telemetry). This table sets the autonomy ceiling per workflow. [BPG: candidate chairman-level artifact.]
+**Anchor definition.** Per team (or business unit): a one-page objective/anchor table. Objectives are what graphs optimize; anchors are external signals used to verify (cash landed, churn, customer-found incidents, third-party seeds, frozen-config telemetry). This table sets the autonomy ceiling per workflow, and is a leadership-level artifact — reviewed at whatever level owns the objectives it encodes.
 
 **Cost plumbing.** Per-run and per-team attribution, hard caps per run, alerts on anomalous spend. Do this before adoption, not after the first surprise bill. Dynamic workflows consume meaningfully more than normal sessions by design.
 
@@ -57,7 +57,7 @@ Only for workflows that genuinely cross ownership boundaries.
 **Surfaces by output shape:**
 - Code-shaped → PR review (diff, discussion, audit free)
 - Decision-shaped → chat with structured response options (Slack/Discord; Claude Tag-style multiplayer where available)
-- Fleet health → run dashboard: active runs, pending gates by assignee, gate latency, spend, anomalies. [BPG: Crow's Nest pattern pointed at agent runs.]
+- Fleet health → run dashboard: active runs, pending gates by assignee, gate latency, spend, anomalies. If the org already runs an operational status dashboard, point that pattern at agent runs rather than building a new surface.
 
 **Resource registry.** Declare shared resources (tables, APIs, files) per workflow; scheduler flags contention between concurrent runs. Rule: two nodes writing the same resource need an edge, not parallelism. Build before the first collision, not after.
 

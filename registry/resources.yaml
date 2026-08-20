@@ -28,3 +28,11 @@ resources:
     owner: dana
     frozen: false
     description: Public release notes page.
+
+  - id: support.ticket-tags
+    kind: api
+    owner: security-owner
+    frozen: true
+    description: >
+      Support ticket tagging (support-owned). Measurement instrument for the
+      customer-found-incidents anchor.

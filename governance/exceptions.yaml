@@ -9,8 +9,10 @@
 # Rules (validated by scripts/validate.py):
 #   - every entry: id, target, code, reason, approved_by, granted, expires
 #   - approved_by must name the security/identity owner or the shared
-#     services maintainer (a human handle; approving your own exception for
-#     a spec you own defeats the point — reviewers check this on the PR)
+#     services maintainer (a human handle). An approver who is the target
+#     spec's owner or backup_owner voids the exception — CI enforces this
+#     (GE-EXC-SELF); reviewers still confirm the approver actually holds
+#     one of the two privileged roles.
 #   - expires is mandatory, max 90 days out from granted; an expired entry
 #     is a CI error until removed or consciously renewed by PR
 #   - non-waivable codes (GE-FROZEN-WRITE, GE-SELF-APPROVE) are rejected
