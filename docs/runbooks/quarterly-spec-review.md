@@ -20,11 +20,21 @@ shared services maintainer runs this; output is one PR plus a short summary.
    flags. Near-zero override → the gate is theater (propose removing it) or
    review stopped happening (fix reviewer load). Over ~30% → the workflow is
    producing junk; the fix is upstream, not more review.
-5. **Registry hygiene.** Agents whose specs are killed/deprecated →
-   `retired`, credentials destroyed. Resources no spec references → removed
-   or marked. Anchor tables past their review date → back to their owners.
-6. **Kill-switch drill.** Run the drill in `docs/runbooks/kill-switch.md`.
-7. **Update `review_by`** (+3 months) on every spec that survived, in the
+5. **Registry hygiene and recertification.** Agents whose specs are
+   killed/deprecated → `retired`, credentials destroyed. For every active
+   agent: re-verify owner, credential scopes, and kill switch, then bump
+   its `review_by` (+3 months) — a lapsed date fails CI. Resources no spec
+   references → removed or marked. Anchor tables past their review date →
+   back to their owners.
+6. **Exception register.** Every entry in `governance/exceptions.yaml`
+   is re-justified or removed. Expired and unused entries are already
+   flagged by CI; anything renewed a second time is a standing gap —
+   fix the underlying cause or accept it explicitly in decision-rights
+   terms, not by serial renewal.
+7. **Platform hardening re-check.** Re-verify `docs/platform-hardening.md`
+   (branch protection intact, Actions token read-only, no repo secrets).
+8. **Kill-switch drill.** Run the drill in `docs/runbooks/kill-switch.md`.
+9. **Update `review_by`** (+3 months) on every spec that survived, in the
    same PR as any status changes.
 
 ## Summary format

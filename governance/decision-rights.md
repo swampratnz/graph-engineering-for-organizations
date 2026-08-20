@@ -44,6 +44,17 @@ with **no approval needed**. Restart requires approval: a PR flipping the
 registry status back to `active`, approved by the security/identity owner.
 See `docs/runbooks/kill-switch.md`.
 
+### Exceptions to validator rules
+
+The only sanctioned way to run out of compliance: an entry in
+`governance/exceptions.yaml` — reason, named approver (security/identity
+owner or shared services maintainer; never someone approving their own
+exception), and an expiry of at most 90 days. CI turns the covered error
+into a warning until expiry, then it's an error again. Frozen-instrument
+writes and self-approval are never waivable (`SECURITY.md`). A second
+renewal of the same exception is a standing gap — escalate it at the
+quarterly review instead of renewing serially.
+
 ### Gate changes (reviewers, timeouts, escalation paths)
 
 DRI decides via PR on the spec. The validator enforces the invariants: every

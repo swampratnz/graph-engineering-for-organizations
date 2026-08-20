@@ -4,8 +4,13 @@
 # it gets credentials. Rules (validated by scripts/validate.py):
 #   - unique id; no shared credentials; agents never impersonate humans
 #   - named human owner (a person, not a team alias)
-#   - credentials are scoped and just-in-time; document how they're issued
+#   - credentials are scoped and just-in-time (kind: jit) — a standing
+#     credential fails CI (GE-CRED-STANDING) unless covered by an expiring
+#     exception in governance/exceptions.yaml
 #   - a working kill switch, and who may pull it
+#   - review_by: quarterly recertification date; an active agent past it
+#     fails CI (GE-AGENT-RECERT) until owner/scopes/kill switch are
+#     re-verified and the date bumped
 #   - specs may only reference agents listed here with status: active
 #
 # Lifecycle: active -> disabled (kill switch pulled; no approval needed)
@@ -16,6 +21,7 @@ agents:
   - id: example-release-bot
     owner: alice
     created: 2026-08-20
+    review_by: 2026-11-20
     status: active
     purpose: Runs the weekly-release-review graph for example-team.
     credentials:
