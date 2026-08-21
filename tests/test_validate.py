@@ -235,6 +235,16 @@ class ValidatorCase(unittest.TestCase):
         self.assertIn("WAIVED", res.stdout)
         self.assertNotIn("matches no current error", res.stdout)
 
+    # -- a non-date created must be caught on agents as it is on specs ------
+    def test_agent_created_not_a_date(self):
+        # created declares format: date, but Draft 2020-12 treats format as an
+        # annotation, so a present-but-garbage value slips the schema. It is
+        # backstopped on specs (check_ownership); an agent registry entry must
+        # be caught identically (GE-SCHEMA), not validate clean.
+        self.edit(self.repo / "registry" / "agents.yaml",
+                  "created: 2026-08-20", "created: banana")
+        self.assert_error(run_validator(self.repo), "GE-SCHEMA")
+
     # -- self-approval must resolve every target form, not just spec names ---
     def _backup_reviews_weekly(self) -> None:
         """Make dana (backup owner of weekly-release-review, owner alice) a
