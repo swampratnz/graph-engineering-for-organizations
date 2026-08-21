@@ -1,10 +1,10 @@
-# Machine-readable anchor table — copy to governance/anchors/<team>.yaml.
+# Machine-readable anchor table; copy to governance/anchors/<team>.yaml.
 #
 # This is the enforced side of the team's anchor table; the .md file with
 # the same name carries the prose (objectives, rationale, ceilings). CI
 # validates (scripts/validate.py):
 #   - every anchor has an id and an instrument
-#   - the instrument exists in registry/resources.yaml with frozen: true —
+#   - the instrument exists in registry/resources.yaml with frozen: true;
 #     an anchor measured by something the optimizing side can write to is
 #     an internal metric, whatever it's called
 #   - any spec with anchor_class: external may only claim anchor ids listed

@@ -14,14 +14,14 @@ Two codes are never waivable:
   GE-SELF-APPROVE  a spec owner reviewing/escalation-target of their own gates
 
 Identity handles (owners, backups, reviewers, escalation targets, approvers)
-are compared case-insensitively — GitHub handles are case-insensitive, so
+are compared case-insensitively; GitHub handles are case-insensitive, so
 `Alice` and `alice` are the same person here too.
 
 Checks, mapped to the plan:
   structural   GE-SCHEMA, GE-FM, GE-NAME-DUP  frontmatter shape; every .md
                                               under specs/ except the exact
                                               top-level TEMPLATE.md/README.md
-                                              is validated — there is no
+                                              is validated; there is no
                                               filename that dodges the rules
   identity     GE-AGENT-*                     agents registered, active, owned,
                                               kill-switchable; JIT credentials
@@ -33,7 +33,7 @@ Checks, mapped to the plan:
                GE-CONTENTION                  one writer per resource
   gates        GE-GATE-*, GE-SELF-APPROVE,    timeouts explicit, escalation
                GE-BACKUP-APPROVE,             named and independent of the
-               GE-ESC-OWNER, GE-ESC-REVIEWER  gate it escalates from,
+               GE-ESC-REVIEWER                gate it escalates from,
                                               separation of duties for owner
                                               (non-waivable) and backup
                                               (waivable by exception)
@@ -161,7 +161,7 @@ def load_exceptions() -> None:
         code = str(entry["code"])
         if code in NON_WAIVABLE:
             err(EXCEPTIONS_PATH, "GE-EXC-NONWAIVABLE",
-                f"exception {exc_id!r} targets non-waivable code {code} — "
+                f"exception {exc_id!r} targets non-waivable code {code}; "
                 "frozen instruments and separation of duties never bend")
             continue
         approvers = entry["approved_by"]
@@ -177,11 +177,11 @@ def load_exceptions() -> None:
         if (expires - granted).days > MAX_EXCEPTION_DAYS:
             err(EXCEPTIONS_PATH, "GE-EXC-INVALID",
                 f"exception {exc_id!r}: expiry exceeds {MAX_EXCEPTION_DAYS} "
-                "days from grant — renew consciously instead")
+                "days from grant; renew consciously instead")
             continue
         if expires < TODAY:
             err(EXCEPTIONS_PATH, "GE-EXC-EXPIRED",
-                f"exception {exc_id!r} expired {expires} — remove it or "
+                f"exception {exc_id!r} expired {expires}; remove it or "
                 "renew it by PR; the underlying error is live again")
             continue
         exception_entries.append(entry)
@@ -205,7 +205,7 @@ def prune_self_approved_exceptions(specs: list[tuple[Path, dict]]) -> None:
         if bad:
             exc_id = str(entry["id"])
             err(EXCEPTIONS_PATH, "GE-EXC-SELF",
-                f"exception {exc_id!r} approved by {bad} — the owner/backup "
+                f"exception {exc_id!r} approved by {bad}; the owner/backup "
                 f"of {target!r} cannot approve their own exception; the "
                 "waiver is void")
             active_exceptions.pop((target, str(entry["code"])), None)
@@ -214,7 +214,7 @@ def prune_self_approved_exceptions(specs: list[tuple[Path, dict]]) -> None:
 def parse_frontmatter(path: Path) -> dict | None:
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---"):
-        err(path, "GE-FM", "missing YAML frontmatter — every .md under "
+        err(path, "GE-FM", "missing YAML frontmatter; every .md under "
             "specs/ (except the top-level TEMPLATE.md) must be a valid spec")
         return None
     parts = text.split("\n---", 2)
@@ -303,7 +303,7 @@ def load_anchor_tables(resources: dict[str, dict]) -> dict[str, dict[str, str]]:
             elif not res.get("frozen"):
                 err(path, "GE-ANCHOR-INSTRUMENT",
                     f"anchor {aid!r}: instrument {instrument!r} is not "
-                    "frozen — an anchor measured by an instrument the "
+                    "frozen; an anchor measured by an instrument the "
                     "optimizing side can write to is an internal metric")
             anchors[aid] = instrument
         tables[team] = anchors
@@ -325,7 +325,7 @@ def check_agents(path: Path, fm: dict, agents: dict[str, dict]) -> None:
         entry = agents.get(agent_id)
         if entry is None:
             err(path, "GE-AGENT-UNREG",
-                f"agent {agent_id!r} is not in registry/agents.yaml — "
+                f"agent {agent_id!r} is not in registry/agents.yaml; "
                 "register the identity before the spec merges", target=name)
             continue
         if entry.get("status") != "active" and fm.get("status") in ACTIVE_STATUSES:
@@ -348,7 +348,7 @@ def check_humans(path: Path, fm: dict, agent_ids: set[str]) -> None:
     owner, backup = fm.get("owner"), fm.get("backup_owner")
     if owner and backup and norm(owner) == norm(backup):
         err(path, "GE-OWNER-BACKUP",
-            f"backup_owner {backup!r} is the owner — escalation and absence "
+            f"backup_owner {backup!r} is the owner; escalation and absence "
             "cover need a second person", target=name)
     roles = [("owner", owner), ("backup_owner", backup)]
     for gate in fm.get("gates") or []:
@@ -364,7 +364,7 @@ def check_humans(path: Path, fm: dict, agent_ids: set[str]) -> None:
     for role, handle in roles:
         if handle and norm(handle) in agent_ids:
             err(path, "GE-HUMAN-ROLE",
-                f"{role} is {handle!r}, a registered agent identity — "
+                f"{role} is {handle!r}, a registered agent identity; "
                 "governance roles are held by humans (delegation, not "
                 "impersonation)", target=name)
 
@@ -376,7 +376,7 @@ def check_gates(path: Path, fm: dict) -> None:
     gates = fm.get("gates") or []
     if status in ACTIVE_STATUSES and not gates:
         err(path, "GE-GATE-NONE",
-            "active spec has no gates — even sampling oversight keeps "
+            "active spec has no gates; even sampling oversight keeps "
             "100% gates on irreversible/external actions", target=name)
     seen_ids: set[str] = set()
     for gate in gates:
@@ -387,13 +387,13 @@ def check_gates(path: Path, fm: dict) -> None:
         reviewers = [norm(r) for r in gate.get("reviewers") or []]
         if owner and owner in reviewers:
             err(path, "GE-SELF-APPROVE",
-                f"gate {gid!r}: spec owner {fm.get('owner')!r} is a reviewer "
-                "— authors cannot approve their own graph's outputs",
+                f"gate {gid!r}: spec owner {fm.get('owner')!r} is a "
+                "reviewer: authors cannot approve their own graph's outputs",
                 target=name)
         if backup and backup in reviewers:
             err(path, "GE-BACKUP-APPROVE",
                 f"gate {gid!r}: backup owner {fm.get('backup_owner')!r} is a "
-                "reviewer — the backup operates the workflow when the owner "
+                "reviewer; the backup operates the workflow when the owner "
                 "is away and must not review it (waivable by exception for "
                 "small teams)", target=name)
         if gate.get("on_timeout") == "escalate":
@@ -405,17 +405,17 @@ def check_gates(path: Path, fm: dict) -> None:
                 continue
             if norm(target_h) == owner:
                 err(path, "GE-SELF-APPROVE",
-                    f"gate {gid!r}: escalates to the spec owner — escalation "
+                    f"gate {gid!r}: escalates to the spec owner; escalation "
                     "must not bypass separation of duties", target=name)
             elif norm(target_h) == backup:
                 err(path, "GE-BACKUP-APPROVE",
-                    f"gate {gid!r}: escalates to the backup owner — same "
+                    f"gate {gid!r}: escalates to the backup owner; same "
                     "conflict as the backup reviewing (waivable by exception "
                     "for small teams)", target=name)
             if norm(target_h) in reviewers:
                 err(path, "GE-ESC-REVIEWER",
                     f"gate {gid!r}: escalates to {target_h!r}, already a "
-                    "reviewer on this gate — a timeout would escalate to "
+                    "reviewer on this gate; a timeout would escalate to "
                     "the person who just timed out", target=name)
 
 
@@ -437,7 +437,7 @@ def check_resources(path: Path, fm: dict, resources: dict[str, dict]) -> None:
                 continue
             if direction == "writes" and entry.get("frozen"):
                 err(path, "GE-FROZEN-WRITE",
-                    f"writes frozen resource {res_id!r} — measurement "
+                    f"writes frozen resource {res_id!r}: measurement "
                     "instruments are frozen; no optimizing agent holds "
                     "write access to what measures it", target=name)
 
@@ -459,20 +459,20 @@ def check_autonomy(path: Path, fm: dict,
         if table is None:
             err(path, "GE-ANCHOR-TABLE",
                 f"anchor_class external but no anchor table for team "
-                f"{team!r} — add governance/anchors/{team}.yaml "
+                f"{team!r}; add governance/anchors/{team}.yaml "
                 "(see TEMPLATE.yaml)", target=name)
         else:
             for anchor in anchors:
                 if anchor not in table:
                     err(path, "GE-ANCHOR-UNREG",
                         f"anchor {anchor!r} is not in team {team!r}'s anchor "
-                        "table — a workflow may only claim external anchors "
+                        "table; a workflow may only claim external anchors "
                         "the table defines and a frozen instrument measures",
                         target=name)
     if oversight == "sampling":
         if anchor_class != "external":
             err(path, "GE-SAMPLING-ANCHOR",
-                "sampling oversight requires anchor_class external — "
+                "sampling oversight requires anchor_class external; "
                 "internal metrics alone never justify autonomy increases",
                 target=name)
         if not autonomy.get("sampling_rate"):
@@ -483,7 +483,7 @@ def check_autonomy(path: Path, fm: dict,
                 break
         else:
             warn(path, "sampling oversight with no irreversible/external "
-                       "gate — confirm nothing this graph does is "
+                       "gate; confirm nothing this graph does is "
                        "externally visible")
 
 
@@ -496,11 +496,11 @@ def check_cost(path: Path, fm: dict) -> None:
     if isinstance(cap, (int, float)) and isinstance(alert, (int, float)) and alert >= cap:
         err(path, "GE-COST-ALERT",
             f"alert_threshold_usd ({alert}) must be below "
-            f"cap_per_run_usd ({cap}) — the alert is the early warning",
+            f"cap_per_run_usd ({cap}); the alert is the early warning",
             target=name)
     if isinstance(cap, (int, float)) and isinstance(day, (int, float)) and day < cap:
         err(path, "GE-COST-DAY",
-            f"cap_per_day_usd ({day}) is below cap_per_run_usd ({cap}) — "
+            f"cap_per_day_usd ({day}) is below cap_per_run_usd ({cap}); "
             "a day contains at least one run", target=name)
 
 
@@ -511,7 +511,7 @@ def check_ownership(path: Path, fm: dict) -> None:
             target=fm.get("name"))
         return
     if review_by and review_by < TODAY:
-        msg = (f"orphaned: review_by {review_by} has passed — re-verify the "
+        msg = (f"orphaned: review_by {review_by} has passed; re-verify the "
                "owner or kill the spec (quarterly spec review)")
         if fm.get("status") in ACTIVE_STATUSES:
             err(path, "GE-ORPHAN", msg, target=fm.get("name"))
@@ -531,7 +531,7 @@ def check_write_contention(specs: list[tuple[Path, dict]]) -> None:
             names = ", ".join(fm.get("name", rel(p)) for p, fm in spec_list)
             for path, fm in spec_list:
                 err(path, "GE-CONTENTION",
-                    f"write contention on {res_id!r} with [{names}] — "
+                    f"write contention on {res_id!r} with [{names}]; "
                     "two nodes writing the same resource need an edge, "
                     "not parallelism", target=fm.get("name"))
 
@@ -551,7 +551,7 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
         if norm(entry.get("owner")) in agent_ids:
             err(AGENTS_PATH, "GE-HUMAN-ROLE",
                 f"agent {agent_id!r} is owned by {entry.get('owner')!r}, "
-                "a registered agent identity — owners are humans")
+                "a registered agent identity; owners are humans")
         ks = entry.get("kill_switch")
         if isinstance(ks, dict):
             authorized = ks.get("authorized") or []
@@ -563,13 +563,13 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
                 if norm(a) in agent_ids:
                     err(AGENTS_PATH, "GE-HUMAN-ROLE",
                         f"agent {agent_id!r} kill switch authorizes "
-                        f"{a!r}, a registered agent identity — only humans "
+                        f"{a!r}, a registered agent identity; only humans "
                         "pull kill switches")
         creds = entry.get("credentials")
         if status == "active" and isinstance(creds, dict) \
                 and creds.get("kind") != "jit":
             err(AGENTS_PATH, "GE-CRED-STANDING",
-                f"agent {agent_id!r} has {creds.get('kind')!r} credentials — "
+                f"agent {agent_id!r} has {creds.get('kind')!r} credentials; "
                 "policy requires JIT/ephemeral (docs/platform-hardening.md); "
                 "a standing credential needs an expiring exception")
         review_by = as_date(entry.get("review_by"))
@@ -579,7 +579,7 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
                 "is not a date")
         elif status == "active" and review_by and review_by < TODAY:
             err(AGENTS_PATH, "GE-AGENT-RECERT",
-                f"agent {agent_id!r} recertification lapsed {review_by} — "
+                f"agent {agent_id!r} recertification lapsed {review_by}; "
                 "re-verify owner, scopes, and kill switch, then bump "
                 "review_by")
 
@@ -589,7 +589,7 @@ def main() -> int:
         from jsonschema import Draft202012Validator as validator_cls
     except ImportError:
         validator_cls = None
-        warnings.append("WARNING jsonschema not installed — structural schema "
+        warnings.append("WARNING jsonschema not installed; structural schema "
                         "checks skipped (pip install -r requirements.txt)")
 
     load_exceptions()
@@ -602,7 +602,7 @@ def main() -> int:
     agent_ids = {norm(a) for a in agents}
 
     if not CODEOWNERS_PATH.exists():
-        warn(CODEOWNERS_PATH, "missing — review routing in "
+        warn(CODEOWNERS_PATH, "missing; review routing in "
              "governance/decision-rights.md is unenforced")
 
     # Pass 1: parse every spec so exception self-approval can be resolved
@@ -642,7 +642,7 @@ def main() -> int:
         if exc_id not in used_exceptions:
             warn(EXCEPTIONS_PATH,
                  f"exception {exc_id!r} ({code} on {target!r}) matches no "
-                 "current error — remove it to keep the register clean")
+                 "current error; remove it to keep the register clean")
 
     for w in warnings:
         print(w)

@@ -4,7 +4,7 @@
 # it gets credentials. Rules (validated by scripts/validate.py):
 #   - unique id; no shared credentials; agents never impersonate humans
 #   - named human owner (a person, not a team alias)
-#   - credentials are scoped and just-in-time (kind: jit) — a standing
+#   - credentials are scoped and just-in-time (kind: jit); a standing
 #     credential fails CI (GE-CRED-STANDING) unless covered by an expiring
 #     exception in governance/exceptions.yaml
 #   - a working kill switch, and who may pull it

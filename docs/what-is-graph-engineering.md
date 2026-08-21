@@ -85,9 +85,10 @@ end-2027](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-
 (June 2025), citing escalating costs, unclear value, and *inadequate risk
 controls*; MIT's NANDA project found [~95% of GenAI pilots produced no
 measurable P&L impact](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/)
-(Aug 2025, methodology contested), attributing failure to adoption
-mismanagement. Declared, CI-enforced governance is the treatment for
-exactly those causes, and it's cheap when it's files in a repo.
+(Aug 2025, methodology contested), attributing most failures to a
+learning gap and generic tools that don't adapt to the workflow.
+Declared, CI-enforced governance is the treatment for exactly those
+causes, and it's cheap when it's files in a repo.
 
 **2. Human review capacity is the real constraint, and unmanaged gates
 die quietly.** In the largest builder survey, [quality/trust is the #1

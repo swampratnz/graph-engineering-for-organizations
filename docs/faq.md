@@ -99,6 +99,35 @@ the honest relief valve for small teams is the exception register, and
 the honest on-ramp is a smaller *scope* (one spec, machinery dormant),
 not weaker rules. Green means one thing here.
 
+**One governance repo for the whole org, or one per product repo?**
+One per org. This repo is where the registries, decision rights, and
+validator live; your product repos stay untouched (the
+[walkthrough's](walkthrough.md) two-repo model). Teams are directories
+under `specs/<team>/`, sharing one registry and one green checkmark.
+Split into separate governance repos only for genuinely separate
+governance domains: no shared reviewers, no shared security owner, no
+shared resources. Separate repos means separate registries, and an agent
+missing from the registry you're looking at is indistinguishable from a
+shadow agent.
+
+**The validator compares handle strings. What makes `pat` a real person?**
+Nothing in the validator; that's deliberate, and three layers outside it
+do the binding. PR review: names must be people who agreed
+([`AGENTS.md`](../AGENTS.md) ground rule 6). Platform enforcement:
+CODEOWNERS plus branch protection mean the named owner's actual GitHub
+account must approve changes ([platform
+hardening](platform-hardening.md)). The gate surface: child issues get
+assigned to that account, so a handle with no human behind it fails at
+the first gate assignment, loudly. The validator's job is coherence
+between files; personhood is enforced where accounts are checked.
+
+**What happens when `graph/v1` changes?**
+`spec: graph/v1` names the schema version, and only v1 exists. Schema
+changes carry the same protected review as validator changes (CODEOWNERS
+on `schemas/`). A future v2 would land alongside v1 with a written
+migration and a deprecation window, never by silently breaking existing
+specs; a spec that validated green stays green until its team moves it.
+
 **How does this relate to our GRC / compliance tooling?**
 GRC platforms record attestations; this repo is the *control itself*.
 The PR gate and validator are the enforcement point, and your GRC tool

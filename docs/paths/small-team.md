@@ -72,8 +72,9 @@ sturdier review structure than two people alone ever was.
 Prescribed, not a menu. The evidence says pick **one** narrow,
 recurring, internal-facing chore and measure it: in
 [MIT's study of failed pilots](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/)
-(Aug 2025; methodology contested), the failing majority automated
-broadly and shallowly while the winners went narrow and deep.
+(Aug 2025; methodology contested), the winners picked one pain point
+and executed well, while MIT attributes most failures to a learning
+gap: generic tools bolted on without adapting to the workflow.
 Best-evidenced starters:
 
 | Workflow | Why it works first |

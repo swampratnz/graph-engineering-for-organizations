@@ -6,7 +6,8 @@ first GRAPH SPEC passing CI**, and one run of it executed by hand. All
 decisions are pre-made: defaults first, understanding as you go,
 customization after.
 
-**You need:** git and a GitHub account, Python 3.10+, one teammate for
+**You need:** git and a GitHub account, Python 3.10+ (on Windows, call
+`python` wherever this doc says `python3`), one teammate for
 step 5 (they'll spend two minutes). **Your repo needs**, before an agent
 touches it: CI you actually trust, tests worth trusting, and branch
 protection on the default branch.
@@ -37,8 +38,8 @@ exit 0. Everything else in this tutorial is about what it's checking.
 
 Open
 [`specs/example-team/ci-failure-explainer.md`](../specs/example-team/ci-failure-explainer.md),
-the minimal reference spec, about 45 frontmatter lines. Read it top to
-bottom; here is what each block is doing:
+the minimal reference spec, just under 50 frontmatter lines. Read it
+top to bottom; here is what each block is doing:
 
 - **Identity and ownership** (`name`…`review_by`): one accountable human
   (`owner: dana`), a named absence cover (`backup_owner: alice`), and a
@@ -76,7 +77,7 @@ The fastest way to learn the rules is to trip them. Make each edit to
 `reviewers: [bob]` to `reviewers: [dana]`:
 
 ```
-ERROR   specs/example-team/ci-failure-explainer.md: [GE-SELF-APPROVE] gate 'weekly-digest-review': spec owner 'dana' is a reviewer — authors cannot approve their own graph's outputs
+ERROR   specs/example-team/ci-failure-explainer.md: [GE-SELF-APPROVE] gate 'weekly-digest-review': spec owner 'dana' is a reviewer: authors cannot approve their own graph's outputs
 ```
 
 This is one of the two rules **no exception can waive**: self-certified
@@ -86,7 +87,7 @@ work is invisible-from-inside failure ([SECURITY.md](../SECURITY.md)).
 `writes: [repo.issue-comments]` to `writes: [telemetry.release-health]`:
 
 ```
-ERROR   specs/example-team/ci-failure-explainer.md: [GE-FROZEN-WRITE] writes frozen resource 'telemetry.release-health' — measurement instruments are frozen; no optimizing agent holds write access to what measures it
+ERROR   specs/example-team/ci-failure-explainer.md: [GE-FROZEN-WRITE] writes frozen resource 'telemetry.release-health': measurement instruments are frozen; no optimizing agent holds write access to what measures it
 ```
 
 The other never-waivable rule. The thing that measures a workflow must
@@ -128,7 +129,7 @@ Fill the frontmatter with the smallest honest value per field:
 | `shape` / `runtime` | `personal` / `ticket` |
 | `autonomy` | `internal`, `anchors: []`, `full-gating`; always start here |
 | `cost` | The most a single run is worth to you; alert below it |
-| `resources` | Everything it touches, registered in [`registry/resources.yaml`](../registry/resources.yaml) in the same PR |
+| `resources` | Everything it touches, registered in [`registry/resources.yaml`](../registry/resources.yaml) in the same PR. Give your spec its own write targets rather than reusing another active spec's; two active writers on one resource fail CI (`GE-CONTENTION`) |
 | `gates` | One gate, a reviewer who is neither owner nor backup, `on_timeout: default_deny` (escalation needs a fourth person; add it when you have one) |
 | `pathology_guards` | `1 / 2 / true / reject` for a single-agent graph |
 | `kill_switch` | How you'd actually stop it, and who may |
@@ -186,7 +187,6 @@ labor, not the contract.
 **The clock**: steps budget to ~65 minutes. If it took you meaningfully
 longer, the docs failed, not you; please open an issue saying where the
 time went. Time-to-first-green is this guide's own gate metric
-([design](practical-guide-design.md#6-how-well-know-the-guide-works)).
-
-Note: the error messages quoted in step 3 are verbatim validator output
-and keep its punctuation.
+([design](practical-guide-design.md#6-how-well-know-the-guide-works)),
+and its instrument is [`metrics/tutorial-runs.md`](../metrics/tutorial-runs.md):
+add your run by PR, honest numbers only, blockers included.

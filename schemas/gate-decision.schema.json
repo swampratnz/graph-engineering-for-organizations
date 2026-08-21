@@ -10,7 +10,7 @@
     "run_id": { "type": "string", "description": "The run this gate belongs to." },
     "gate_id": { "type": "string", "description": "Gate id from the spec frontmatter." },
     "decision": { "enum": ["approve", "reject", "modify"] },
-    "reason": { "type": "string", "minLength": 1, "description": "Why. Required for every decision, including approve — this is what makes override-rate and rubber-stamp metrics computable." },
+    "reason": { "type": "string", "minLength": 1, "description": "Why. Required for every decision, including approve; this is what makes override-rate and rubber-stamp metrics computable." },
     "modification": { "type": "string", "description": "Required when decision is modify: what was changed before proceeding." },
     "decided_by": { "type": "string", "description": "Human identity that resolved the gate. Must be an authorized reviewer for this gate class; must not be the spec owner." },
     "decided_at": { "type": "string", "format": "date-time" },

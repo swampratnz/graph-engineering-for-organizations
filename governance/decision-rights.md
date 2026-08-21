@@ -61,6 +61,17 @@ DRI decides via PR on the spec. The validator enforces the invariants: every
 gate has a timeout behavior, escalation names a person, and the spec owner
 never reviews their own gates.
 
+### Ownership transfer (an owner hands over, or leaves)
+
+One PR, initiated by the outgoing owner, or by the security/identity
+owner within a week of a departure: reassign `owner` and `backup_owner`
+on every spec the person holds, update their agents' owners and
+kill-switch holders in `registry/agents.yaml`, and update CODEOWNERS,
+with the incoming people's agreement per `AGENTS.md` ground rule 6.
+Approved by the shared services maintainer. The validator's `review_by`
+dates are the backstop that catches a missed transfer (the spec goes
+orphaned at the next quarterly date); the PR above is the process.
+
 ### Separation of duties
 
 A spec's `owner` may not appear as a reviewer on any of its gates and may not

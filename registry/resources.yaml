@@ -4,7 +4,7 @@
 # Rules (validated by scripts/validate.py):
 #   - specs may only declare resources listed here
 #   - frozen: true marks a measurement instrument. No spec may declare a write
-#     on a frozen resource — no optimizing agent (or team being measured) holds
+#     on a frozen resource; no optimizing agent (or team being measured) holds
 #     write access to the instruments that measure it.
 #   - two active specs writing the same resource are flagged: two nodes writing
 #     the same resource need an edge, not parallelism. Build the edge (or merge
