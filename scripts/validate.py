@@ -662,6 +662,18 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
             if not entry.get(field):
                 err(AGENTS_PATH, "GE-REG",
                     f"agent {agent_id!r} missing {field!r}")
+        # created declares format: date in intent, but Draft 2020-12 treats
+        # format as an annotation, so a present-but-garbage value slips the
+        # schema. Backstop it exactly as check_ownership does for specs, so a
+        # non-date created reports identically (GE-SCHEMA) whether it is on a
+        # spec or an agent. A missing/empty created is already GE-REG above;
+        # only flag a value that is present but unparseable, so it is not
+        # reported twice. (review_by has its own date backstop below.)
+        created = entry.get("created")
+        if created and as_date(created) is None:
+            err(AGENTS_PATH, "GE-SCHEMA",
+                f"agent {agent_id!r} created {created!r} is not a date "
+                "(YYYY-MM-DD)", target=agent_id)
         status = entry.get("status")
         if status not in (None, "active", "disabled", "retired"):
             err(AGENTS_PATH, "GE-REG",

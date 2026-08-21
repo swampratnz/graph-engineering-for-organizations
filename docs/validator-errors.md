@@ -70,7 +70,7 @@ read this as the honest boundary of the green checkmark:
 | Code | Trips when | Fix |
 |------|-----------|-----|
 | `GE-FM` | A `.md` under `specs/` (other than top-level `TEMPLATE.md`/`README.md`) has missing, unterminated, or invalid YAML frontmatter | Every file under `specs/` is a spec; give it valid frontmatter or move it out |
-| `GE-SCHEMA` | Frontmatter violates [`schemas/graph-spec.schema.json`](../schemas/graph-spec.schema.json): missing required field, wrong enum, mixed-case handle, or a `created` that isn't a real `YYYY-MM-DD` date | The message names the exact path (e.g. `gates/0: 'timeout_hours' is a required property`); fix that field |
+| `GE-SCHEMA` | Frontmatter violates [`schemas/graph-spec.schema.json`](../schemas/graph-spec.schema.json): missing required field, wrong enum, mixed-case handle, or a `created` that isn't a real `YYYY-MM-DD` date (backstopped on both spec frontmatter and agent registry entries, since Draft 2020-12 does not enforce `format: date`) | The message names the exact path (e.g. `gates/0: 'timeout_hours' is a required property`); fix that field |
 | `GE-NAME-DUP` | Two specs share a `name` | Names are unique across `specs/`; rename one |
 
 ## Agent identity
