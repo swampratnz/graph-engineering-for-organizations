@@ -1,12 +1,12 @@
 ---
-# GRAPH SPEC — copy this file into specs/<team>/<name>.md and fill in every field.
+# GRAPH SPEC: copy this file into specs/<team>/<name>.md and fill in every field.
 # Frontmatter is machine-validated by scripts/validate.py (run in CI on every PR).
 # Delete the comments when you're done; keep the keys.
 spec: graph/v1
 name: my-workflow-name                # kebab-case, unique across specs/
 status: draft                         # draft | pilot | promoted | deprecated | killed
 team: my-team
-owner: github-handle                  # the Workflow DRI. Exactly one. Lowercase —
+owner: github-handle                  # the Workflow DRI. Exactly one. Lowercase;
                                       # handles are compared case-insensitively and
                                       # the schema rejects mixed case.
 backup_owner: github-handle           # covers the owner's absence. Not the owner,
@@ -37,12 +37,12 @@ autonomy:
   oversight: full-gating              # full-gating | sampling. sampling requires
                                       # anchor_class: external AND 4 weeks of gate metrics
                                       # (see governance/decision-rights.md).
-  sampling_rate: null                 # e.g. 0.10 — required when oversight is sampling.
+  sampling_rate: null                 # e.g. 0.10; required when oversight is sampling.
 
 cost:
   cap_per_run_usd: 5                  # hard cap; the runtime must stop the run at this spend.
   alert_threshold_usd: 3              # anomaly alert to the owner before the cap is hit.
-  # cap_per_day_usd: 25               # optional aggregate ceiling — bounds many runs each
+  # cap_per_day_usd: 25               # optional aggregate ceiling; bounds many runs each
                                       # under cap (cron storms, retry loops). Must be >= the
                                       # per-run cap.
 
@@ -67,7 +67,7 @@ gates:                                # every human node. At least one unless st
     on_timeout: escalate              # escalate | default_deny | reroute
     escalate_to: github-handle        # required when on_timeout is escalate. Not the
                                       #   owner/backup, and not already a reviewer on
-                                      #   this gate — escalation needs a fresh person.
+                                      #   this gate; escalation needs a fresh person.
 
 pathology_guards:
   max_debate_rounds: 3                # cap on any agent-debate pattern
@@ -107,8 +107,8 @@ graph LR
     D --> E[Record anchor outcome]
 ```
 
-For every node with side effects, state its idempotency key — derived from
-`(run_id, step_id)` — and what a safe retry looks like.
+For every node with side effects, state its idempotency key, derived from
+`(run_id, step_id)`, and what a safe retry looks like.
 
 ## Human node contracts
 
@@ -129,4 +129,4 @@ gate-health metrics for this workflow.
 
 | Date | Change | Evidence |
 |------|--------|----------|
-| YYYY-MM-DD | Created as draft | — |
+| YYYY-MM-DD | Created as draft | none |

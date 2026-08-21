@@ -11,7 +11,7 @@ Median hours from gate-open (the run enters `waiting_on_gate` for that gate)
 to a decision record's `decided_at`. Per gate, weekly.
 
 - Pilot success threshold: median < 24h.
-- Blowout means the org's review capacity or gate design is the constraint —
+- Blowout means the org's review capacity or gate design is the constraint;
   the fix is fewer/better gates or more anchors, not more orchestration.
 
 ## 2. Override rate
@@ -33,7 +33,7 @@ Signals that review isn't real, checked per reviewer per gate:
   approvals.
 - **Canaries:** occasionally route a known-bad artifact through the gate
   (owner plants it; reviewers know canaries exist, not when). A missed
-  canary is a gate-design finding, never an individual's performance metric —
+  canary is a gate-design finding, never an individual's performance metric;
   the moment it becomes one, people game it and the signal dies.
 
 ## 4. Cost per run vs. value
@@ -53,5 +53,5 @@ the only evidence that counts toward autonomy increases
 
 Pending-gate assignments and decisions per reviewer per week, against the
 10-20 supervised-agent ceiling (2-3 without a proper operator surface).
-When a reviewer trends toward the ceiling, that constrains fleet growth —
+When a reviewer trends toward the ceiling, that constrains fleet growth;
 plan headcount around review capacity, not agent count.

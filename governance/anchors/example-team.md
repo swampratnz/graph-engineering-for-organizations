@@ -1,4 +1,4 @@
-# Anchor table — example-team
+# Anchor table: example-team
 
 Reference table backing the example pilot spec
 (`specs/example-team/weekly-release-review.md`). Replace with your own team's

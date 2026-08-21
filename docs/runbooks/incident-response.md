@@ -2,8 +2,8 @@
 
 For incidents involving an AI agent or workflow governed by this repo:
 suspected credential compromise, an agent acting outside its spec, anomalous
-spend, a gate bypassed, or a frozen instrument touched. Complements — does
-not replace — the org's general security IR process; if one exists, this
+spend, a gate bypassed, or a frozen instrument touched. Complements (does
+not replace) the org's general security IR process; if one exists, this
 slots in as the agent-specific annex.
 
 ## Severity
@@ -18,14 +18,14 @@ When unsure between two severities, take the higher one.
 
 ## Response steps
 
-1. **Stop the harm.** For S1/S2, execute `docs/runbooks/kill-switch.md` —
+1. **Stop the harm.** For S1/S2, execute `docs/runbooks/kill-switch.md`:
    credentials first, then in-flight runs. Stopping needs no approval;
    restarting does.
 2. **Preserve evidence before touching anything else.** Snapshot: the run
    records and parent/child issues for affected runs, the agent's entries in
    the org audit log, the registry state (`git log` covers this repo), and
    spend records. For S1, export the audit log slice covering the
-   credential's lifetime — threat #1 in `SECURITY.md` is only investigable
+   credential's lifetime; threat #1 in `SECURITY.md` is only investigable
    from logs.
 3. **Scope it.** From the resource declarations in the spec and the audit
    log: what could this identity reach, what did it actually touch, which
@@ -38,7 +38,7 @@ When unsure between two severities, take the higher one.
    run's parent issue so the audit trail is self-contained.
 5. **Regulatory check (S1, and S2 involving high-risk workflows).** If the
    workflow falls under the EU AI Act's high-risk provisions, serious
-   incidents carry reporting obligations with deadlines — the security
+   incidents carry reporting obligations with deadlines; the security
    owner engages counsel the same day rather than deciding alone. The run
    records and audit plane are the evidence base
    (`governance/compliance-mapping.md`).

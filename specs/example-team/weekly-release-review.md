@@ -63,7 +63,7 @@ rule; replace it with your own pilot when you run one.
 ## Objective
 
 Assemble the weekly release candidate summary, verify release health against
-frozen telemetry, and publish release notes — with a human go/no-go gate
+frozen telemetry, and publish release notes, with a human go/no-go gate
 before anything externally visible happens. Verified externally by
 customer-found incidents and rollback rate (see
 `governance/anchors/example-team.md`).
@@ -90,22 +90,22 @@ graph LR
 
 Side-effect nodes and idempotency:
 
-- **publish notes** — idempotency key `(run_id, publish-notes)`; publishing is
+- **publish notes**: idempotency key `(run_id, publish-notes)`; publishing is
   an upsert keyed on the release tag, so a retry overwrites the same page
   rather than creating a duplicate.
 
 ## Human node contracts
 
-- **release-go-no-go** — Input: the release summary artifact (changes, risk
+- **release-go-no-go**: Input: the release summary artifact (changes, risk
   callouts, current telemetry snapshot). Output: structured
   approve/reject/modify + reason. Reviewer: bob; timeout 24h then escalate
   to carol. Resolved as a child issue on the run's parent issue.
-- **notes-quality** — Input: the draft notes as a PR diff against the notes
+- **notes-quality**: Input: the draft notes as a PR diff against the notes
   page. Output: PR review mapped to approve/reject/modify. Reviewer: carol;
   timeout 48h then default-deny (notes ship the following week instead).
 
 Note the separation math for a four-person team: alice owns, dana is backup,
-so bob and carol hold the gates — neither the owner nor the backup reviews
+so bob and carol hold the gates; neither the owner nor the backup reviews
 anything this graph produces (CI enforces both; the backup rule is waivable
 by exception for smaller teams, the owner rule is not).
 
@@ -120,4 +120,4 @@ completion. Gate-health metrics reviewed weekly by the owner against
 
 | Date | Change | Evidence |
 |------|--------|----------|
-| 2026-08-20 | Created as pilot reference spec | — |
+| 2026-08-20 | Created as pilot reference spec | none |

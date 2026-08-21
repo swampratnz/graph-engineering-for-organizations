@@ -29,7 +29,7 @@ at least a defined quality anchor.
 PR on the spec, approved by shared services AND the security/identity owner.
 The PR description must show:
 
-1. Demonstrated anchor coverage — `anchor_class: external` with anchors from
+1. Demonstrated anchor coverage: `anchor_class: external` with anchors from
    the team's anchor table, and anchor outcomes recorded in run records.
 2. Four weeks of gate metrics for the gate being relaxed: latency, override
    rate in band (not ~0%, not >30%), no unresolved rubber-stamp flags.
@@ -47,12 +47,12 @@ See `docs/runbooks/kill-switch.md`.
 ### Exceptions to validator rules
 
 The only sanctioned way to run out of compliance: an entry in
-`governance/exceptions.yaml` — reason, named approver (security/identity
+`governance/exceptions.yaml`: reason, named approver (security/identity
 owner or shared services maintainer; never someone approving their own
 exception), and an expiry of at most 90 days. CI turns the covered error
 into a warning until expiry, then it's an error again. Frozen-instrument
 writes and self-approval are never waivable (`SECURITY.md`). A second
-renewal of the same exception is a standing gap — escalate it at the
+renewal of the same exception is a standing gap; escalate it at the
 quarterly review instead of renewing serially.
 
 ### Gate changes (reviewers, timeouts, escalation paths)
@@ -66,4 +66,4 @@ never reviews their own gates.
 A spec's `owner` may not appear as a reviewer on any of its gates and may not
 be its escalation target. Enforced by CI. If the org is too small to staff a
 gate without the owner, that workflow keeps `full-gating` with a reviewer from
-another team — or doesn't run.
+another team, or doesn't run.
