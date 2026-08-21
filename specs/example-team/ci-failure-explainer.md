@@ -45,7 +45,7 @@ pathology_guards:
 
 kill_switch:
   how: "Set example-explainer-bot to disabled in registry/agents.yaml; suspend the App installation"
-  authorized: [security-owner, owner]
+  authorized: [security-owner, dana]
 ---
 
 # CI failure explainer

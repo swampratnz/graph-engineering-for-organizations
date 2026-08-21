@@ -9,13 +9,18 @@ against it (a `--list-codes` flag to mechanize the diff is on the
 **How waiving works:** most errors can be temporarily downgraded to
 warnings by an entry in
 [`governance/exceptions.yaml`](../governance/exceptions.yaml): named
-approver (who is not a party the waiver benefits, resolved for spec,
-agent, and registry-file targets alike), expiry ≤ 90 days, checked by
-CI. **Never waivable**, and the validator refuses exceptions targeting
-them: `GE-FROZEN-WRITE` and `GE-SELF-APPROVE` (frozen instruments and
-separation of duties never bend), **and the whole `GE-EXC-*` family**:
-an exception cannot waive a finding about the exception register itself,
-or one actor could approve away the very check that catches their
+approver (who is not a party the waiver benefits, resolved for every
+target form: a spec name or its file path, an agent id, and the registry
+and anchor files alike), expiry ≤ 90 days, checked by CI. The approver
+handle must itself be a valid ASCII handle, so whitespace or a look-alike
+character cannot pose as an independent signer, and a target that resolves
+to no known spec, agent, or governance file is rejected (`GE-EXC-INVALID`)
+rather than applied blind. **Never waivable**, and the validator refuses
+exceptions targeting them: `GE-FROZEN-WRITE`, `GE-SELF-APPROVE`, and
+`GE-HUMAN-ROLE` (frozen instruments, separation of duties, and human-only
+governance roles never bend), **and the whole `GE-EXC-*` family**: an
+exception cannot waive a finding about the exception register itself, or
+one actor could approve away the very check that catches their
 self-approval ([SECURITY.md](../SECURITY.md)). When a self-approved
 exception is voided, the error it targeted resurfaces as an error rather
 than being swallowed, so the remediation signal is never lost.
@@ -39,7 +44,11 @@ read this as the honest boundary of the green checkmark:
   is the (unbuilt) control, and `docs/platform-hardening.md` is the
   interim.
 - **That frozen-instrument write access is actually revoked** in the
-  measuring system's own IAM (`platform-hardening.md`).
+  measuring system's own IAM (`platform-hardening.md`). `GE-FROZEN-WRITE`
+  catches a *declared* write on a frozen resource; a spec that omits a
+  write it performs, or a credential scope that silently grants one, is
+  invisible to CI, so IAM revocation is the enforcing control, not this
+  check.
 - **That the runtime honours** `cap_per_run_usd`, timeouts, `on_timeout`,
   the sampling rate, or idempotency keys. The spec declares intent; the
   engine enforces it (`AGENTS.md` Phase C.4).
@@ -61,7 +70,7 @@ read this as the honest boundary of the green checkmark:
 | Code | Trips when | Fix |
 |------|-----------|-----|
 | `GE-FM` | A `.md` under `specs/` (other than top-level `TEMPLATE.md`/`README.md`) has missing, unterminated, or invalid YAML frontmatter | Every file under `specs/` is a spec; give it valid frontmatter or move it out |
-| `GE-SCHEMA` | Frontmatter violates [`schemas/graph-spec.schema.json`](../schemas/graph-spec.schema.json): missing required field, wrong enum, mixed-case handle | The message names the exact path (e.g. `gates/0: 'timeout_hours' is a required property`); fix that field |
+| `GE-SCHEMA` | Frontmatter violates [`schemas/graph-spec.schema.json`](../schemas/graph-spec.schema.json): missing required field, wrong enum, mixed-case handle, or a `created` that isn't a real `YYYY-MM-DD` date | The message names the exact path (e.g. `gates/0: 'timeout_hours' is a required property`); fix that field |
 | `GE-NAME-DUP` | Two specs share a `name` | Names are unique across `specs/`; rename one |
 
 ## Agent identity
@@ -72,7 +81,7 @@ read this as the honest boundary of the green checkmark:
 | `GE-AGENT-INACTIVE` | An active (pilot/promoted) spec references an agent whose status isn't `active` | Restart the agent per [decision rights](../governance/decision-rights.md) (approval required) or deactivate the spec |
 | `GE-AGENT-NOOWNER` | Agent entry has no human owner | Name one person, not a team alias |
 | `GE-AGENT-NOKILL` | Agent entry has no kill switch | Add `kill_switch.how` plus named `authorized` holders |
-| `GE-CRED-STANDING` | An active agent's credentials are anything other than a mapping with `kind: jit` (a non-`jit` kind, a bare scalar, or a dict missing `kind`) | Move to OIDC exchange or per-agent App tokens ([hardening](platform-hardening.md)); a standing credential needs an expiring exception |
+| `GE-CRED-STANDING` | An active agent's credentials are anything other than a mapping with `kind: jit` (a non-`jit` kind, a bare scalar, a dict missing `kind`, or an empty/missing block) | Move to OIDC exchange or per-agent App tokens ([hardening](platform-hardening.md)); a standing credential needs an expiring exception |
 | `GE-AGENT-RECERT` | An active agent's `review_by` has passed | Re-verify owner, scopes, and kill switch; bump the date (quarterly review) |
 | `GE-REG` | A registry file is malformed: missing/duplicate ids, missing required fields, unknown status, kill switch authorizing no one, non-date `review_by` | Fix the named entry |
 
@@ -81,7 +90,7 @@ read this as the honest boundary of the green checkmark:
 | Code | Trips when | Fix |
 |------|-----------|-----|
 | `GE-OWNER-BACKUP` | `backup_owner` is the owner | Two different people; absence cover needs a second human |
-| `GE-HUMAN-ROLE` | A governance role (owner, backup, reviewer, escalation, kill-switch holder) is a registered *agent* identity | Roles are held by humans: delegation, never impersonation |
+| `GE-HUMAN-ROLE` | A governance role (owner, backup, reviewer, escalation, kill-switch holder) is a registered *agent* identity | **Never waivable.** Roles are held by humans: delegation, never impersonation |
 | `GE-SELF-APPROVE` | The spec owner is a reviewer or escalation target on their own gate | **Never waivable.** A different human reviews; see the [separation table](paths/small-team.md#the-separation-of-duties-math) for who can hold what at your size |
 | `GE-BACKUP-APPROVE` | The backup owner is a reviewer or escalation target | Waivable for small teams, and at 2 people the exception's approver must be an *outside* human (`GE-EXC-SELF` voids owner/backup approvals) |
 | `GE-ESC-REVIEWER` | A gate escalates to someone already reviewing that gate | Escalation needs a fresh person; or use `default_deny` |
@@ -114,7 +123,7 @@ read this as the honest boundary of the green checkmark:
 |------|-----------|-----|
 | `GE-COST-ALERT` | `alert_threshold_usd` ≥ `cap_per_run_usd` | The alert is the early warning; set it strictly below the cap |
 | `GE-COST-DAY` | `cap_per_day_usd` < `cap_per_run_usd` | A day contains at least one run; raise the daily cap or lower the per-run cap |
-| `GE-ORPHAN` | An active spec's `review_by` has passed (or isn't a date) | Re-confirm ownership and bump the date, or kill the spec; ownership decay is the org-layer silent node failure |
+| `GE-ORPHAN` | An active spec's `review_by` has passed, or any spec's `review_by` isn't a real date | Re-confirm ownership and bump the date, or kill the spec; ownership decay is the org-layer silent node failure |
 
 ## Exception register
 
@@ -123,10 +132,10 @@ than reaching for another exception:
 
 | Code | Trips when | Fix |
 |------|-----------|-----|
-| `GE-EXC-INVALID` | An entry is malformed: missing fields, bad dates, duplicate id, empty approver list, or expiry more than 90 days from grant | Complete the entry per the template comments in [`exceptions.yaml`](../governance/exceptions.yaml) |
+| `GE-EXC-INVALID` | An entry is malformed: missing fields, bad dates, duplicate id, empty approver list, expiry more than 90 days from grant, an approver that isn't a valid ASCII handle, or a target that names no known spec, agent, or governance file | Complete the entry per the template comments in [`exceptions.yaml`](../governance/exceptions.yaml) |
 | `GE-EXC-EXPIRED` | An entry's `expires` has passed | Remove it, or renew it consciously by PR; the underlying error is live again |
 | `GE-EXC-NONWAIVABLE` | An entry targets `GE-FROZEN-WRITE`, `GE-SELF-APPROVE`, or any `GE-EXC-*` code | Delete it; these never bend, and an exception cannot waive a finding about the register itself ([SECURITY.md](../SECURITY.md)) |
-| `GE-EXC-SELF` | An entry is approved by the target spec's own owner or backup | The waiver is void; an independent approver (security/identity owner or shared-services maintainer) must sign it |
+| `GE-EXC-SELF` | An entry is approved by a party the waiver benefits (resolved for spec-name and spec-file targets, agent ids, and the registry and anchor files) | The waiver is void; an independent approver (security/identity owner or shared-services maintainer) must sign it |
 
 Warnings (never fail the build, still worth reading): a resource listed
 twice in one spec, sampling with no irreversible/external gate, an

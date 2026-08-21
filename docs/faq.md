@@ -86,10 +86,11 @@ and fix it deliberately.
 **Why won't the validator let us waive X even though everyone agrees?**
 Most rules *are* waivable, by an [exception](../governance/exceptions.yaml)
 with a named approver and an expiry, which is agreement made auditable.
-Exactly two never bend: writes to frozen instruments and owners approving
-their own outputs ([SECURITY.md](../SECURITY.md)). Both exist because the
-failure they prevent (gamed metrics, self-certified work) is invisible
-from inside while it's happening.
+Exactly three never bend: writes to frozen instruments, owners approving
+their own outputs, and handing a human governance role to an agent identity
+([SECURITY.md](../SECURITY.md)). All three exist because the failure they
+prevent (gamed metrics, self-certified work, an agent quietly holding a
+human's authority) is invisible from inside while it's happening.
 
 **Why isn't there a relaxed "starter mode"?**
 Considered and declined; the reasoning is recorded in the

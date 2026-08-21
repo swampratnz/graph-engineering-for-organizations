@@ -45,7 +45,7 @@ pathology_guards:
 
 kill_switch:
   how: "Set example-triage-bot to disabled in registry/agents.yaml; revoke its App installation"
-  authorized: [security-owner, owner]
+  authorized: [security-owner, bob]
 ---
 
 # Dependency update triage

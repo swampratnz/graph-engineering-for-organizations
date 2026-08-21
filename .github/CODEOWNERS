@@ -6,10 +6,15 @@
 # for a single-maintainer repo. Before you rely on this in an org, split
 # these across at least three distinct humans: the security/identity owner
 # (/registry/), the shared services maintainer (/schemas/, /scripts/,
-# /workflows/, /specs/TEMPLATE.md), and the governance/leadership approver
-# (/governance/, /docs/plan.md). CODEOWNERS enforcement (a branch-protection
-# setting, see docs/platform-hardening.md) is what turns this file from
-# advice into a required-review gate.
+# /tests/, /workflows/, /.github/, /requirements.txt, /specs/TEMPLATE.md),
+# and the governance/leadership approver (/governance/, /docs/plan.md).
+# CODEOWNERS enforcement (a branch-protection setting, see
+# docs/platform-hardening.md) is what turns this file from advice into a
+# required-review gate.
+
+# Catch-all first (CODEOWNERS is last-match-wins): nothing in the repo is
+# review-exempt by default, including new top-level files.
+*                     @swampratnz
 
 # Security/identity owner: agent registry, credential lifecycle, frozen instruments
 /registry/            @swampratnz
@@ -19,6 +24,14 @@
 /scripts/             @swampratnz
 /workflows/           @swampratnz
 /specs/TEMPLATE.md    @swampratnz
+
+# The enforcement mechanism must not be review-exempt: the CI workflow that
+# runs the validator, the dependency manifest it installs (code that executes
+# in CI), the regression suite that is the validator's product, and this
+# routing file itself. Weakening any of these is a governance change.
+/.github/             @swampratnz
+/requirements.txt     @swampratnz
+/tests/               @swampratnz
 
 # Governance changes are chairman/leadership-level review
 /governance/          @swampratnz

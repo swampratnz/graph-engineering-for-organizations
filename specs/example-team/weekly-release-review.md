@@ -51,7 +51,7 @@ pathology_guards:
 
 kill_switch:
   how: "Set example-release-bot to disabled in registry/agents.yaml; revoke its deploy token"
-  authorized: [security-owner, owner]
+  authorized: [security-owner, alice]
 ---
 
 # Weekly release review

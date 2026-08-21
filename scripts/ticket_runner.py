@@ -106,6 +106,19 @@ def spec_version() -> str:
 
 
 def run_dir(runs_root: Path, run_id: str) -> Path:
+    # run_id becomes a directory name (it comes from --run-id or is derived
+    # from the spec's frontmatter name), so it must stay a single component
+    # inside runs_root. Reject path separators, a leading dot, and parent
+    # references so a crafted id cannot mkdir/write outside runs/.
+    if (not isinstance(run_id, str) or not run_id
+            or "/" in run_id or "\\" in run_id or "\x00" in run_id
+            or run_id.startswith(".")):
+        die(f"invalid run id {run_id!r}: use a single path component with no "
+            "separators or leading dot")
+    root = runs_root.resolve()
+    resolved = (runs_root / run_id).resolve()
+    if resolved != root and root not in resolved.parents:
+        die(f"run id {run_id!r} escapes the runs directory {runs_root}")
     return runs_root / run_id
 
 

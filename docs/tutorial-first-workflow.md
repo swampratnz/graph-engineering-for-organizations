@@ -80,7 +80,7 @@ The fastest way to learn the rules is to trip them. Make each edit to
 ERROR   specs/example-team/ci-failure-explainer.md: [GE-SELF-APPROVE] gate 'weekly-digest-review': spec owner 'dana' is a reviewer: authors cannot approve their own graph's outputs
 ```
 
-This is one of the two rules **no exception can waive**: self-certified
+This is one of the rules **no exception can waive**: self-certified
 work is invisible-from-inside failure ([SECURITY.md](../SECURITY.md)).
 
 **Break 2: write to a measurement instrument.** Change
@@ -90,7 +90,7 @@ work is invisible-from-inside failure ([SECURITY.md](../SECURITY.md)).
 ERROR   specs/example-team/ci-failure-explainer.md: [GE-FROZEN-WRITE] writes frozen resource 'telemetry.release-health': measurement instruments are frozen; no optimizing agent holds write access to what measures it
 ```
 
-The other never-waivable rule. The thing that measures a workflow must
+Another never-waivable rule. The thing that measures a workflow must
 not be writable by it; otherwise the metrics look great while reality
 diverges.
 

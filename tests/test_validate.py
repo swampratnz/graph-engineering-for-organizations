@@ -235,6 +235,114 @@ class ValidatorCase(unittest.TestCase):
         self.assertIn("WAIVED", res.stdout)
         self.assertNotIn("matches no current error", res.stdout)
 
+    # -- self-approval must resolve every target form, not just spec names ---
+    def _backup_reviews_weekly(self) -> None:
+        """Make dana (backup owner of weekly-release-review, owner alice) a
+        gate reviewer, raising a waivable GE-BACKUP-APPROVE on that spec."""
+        self.edit(self.spec("weekly-release-review"),
+                  "reviewers: [carol]", "reviewers: [carol, dana]")
+
+    def test_selfapprove_via_spec_path_is_void(self):
+        # The file-path bypass: err() matches a waiver by the spec's file path
+        # as well as its name, so an owner-approved exception aimed at the path
+        # must still be voided, not applied. (Was WAIVED before the fix.)
+        self._backup_reviews_weekly()
+        self.set_exceptions(
+            "exceptions:\n"
+            "  - id: EX-PATH\n"
+            "    target: specs/example-team/weekly-release-review.md\n"
+            "    code: GE-BACKUP-APPROVE\n"
+            "    reason: probe\n"
+            "    approved_by: [alice]\n"          # alice owns this spec
+            "    granted: 2026-08-21\n"
+            "    expires: 2026-10-01\n")
+        res = run_validator(self.repo)
+        self.assertEqual(res.returncode, 1, res.stdout)
+        self.assertIn("GE-EXC-SELF", res.stdout)
+        self.assertIn("GE-BACKUP-APPROVE", res.stdout)
+        self.assertNotIn("WAIVED", res.stdout)
+
+    def test_selfapprove_via_resources_path_is_void(self):
+        # A file-level waiver on registry/resources.yaml can only be signed by
+        # someone who owns no resource in it; a resource owner is a party.
+        self.edit(self.repo / "registry" / "resources.yaml",
+                  "  - id: release.notes-page", "  - id: repo.main")  # dup id
+        self.set_exceptions(
+            "exceptions:\n"
+            "  - id: EX-RES\n"
+            "    target: registry/resources.yaml\n"
+            "    code: GE-REG\n"
+            "    reason: probe\n"
+            "    approved_by: [alice]\n"          # alice owns repo.main
+            "    granted: 2026-08-21\n"
+            "    expires: 2026-10-01\n")
+        res = run_validator(self.repo)
+        self.assertEqual(res.returncode, 1, res.stdout)
+        self.assertIn("GE-EXC-SELF", res.stdout)
+
+    def test_unknown_exception_target_is_rejected(self):
+        # A target that names no known spec/agent/governance file cannot have
+        # its approver checked, so it is rejected rather than applied blind.
+        self._standing_release_bot()
+        self.set_exceptions(self._exc("registry/nope.yaml", "security-owner"))
+        self.assert_error(run_validator(self.repo), "GE-EXC-INVALID")
+
+    # -- self-approval must not be dodged by a look-alike approver handle ----
+    def _standing_bot_exc(self, approver_line: str) -> None:
+        self._standing_release_bot()
+        self.set_exceptions(
+            "exceptions:\n"
+            "  - id: EX-H\n"
+            "    target: example-release-bot\n"
+            "    code: GE-CRED-STANDING\n"
+            "    reason: probe\n"
+            f"    {approver_line}\n"
+            "    granted: 2026-08-21\n"
+            "    expires: 2026-10-01\n")
+
+    def test_whitespace_approver_is_rejected(self):
+        # 'alice ' (trailing space) is alice; it must not slip past GE-EXC-SELF.
+        self._standing_bot_exc('approved_by: ["alice "]')
+        res = run_validator(self.repo)
+        self.assert_error(res, "GE-EXC-INVALID")
+        self.assertNotIn("WAIVED", res.stdout)
+
+    def test_homoglyph_approver_is_rejected(self):
+        # Cyrillic 'а' (U+0430) + 'lice' renders as 'alice' but is a different
+        # string; a non-ASCII approver handle is rejected outright.
+        self._standing_bot_exc('approved_by: ["аlice"]')
+        res = run_validator(self.repo)
+        self.assert_error(res, "GE-EXC-INVALID")
+        self.assertNotIn("WAIVED", res.stdout)
+
+    # -- GE-HUMAN-ROLE is non-waivable -------------------------------------
+    def test_human_role_is_nonwaivable(self):
+        self.edit(self.spec("ci-failure-explainer"),
+                  "reviewers: [bob]", "reviewers: [example-explainer-bot]")
+        self.set_exceptions(
+            self._exc("ci-failure-explainer", "security-owner")
+            .replace("GE-CRED-STANDING", "GE-HUMAN-ROLE"))
+        res = run_validator(self.repo)
+        self.assert_error(res, "GE-EXC-NONWAIVABLE")
+        self.assertIn("GE-HUMAN-ROLE", res.stdout)
+
+    # -- an empty credentials block is a standing credential ----------------
+    def test_empty_credentials_are_standing(self):
+        self.edit(
+            self.repo / "registry" / "agents.yaml",
+            '    credentials:\n'
+            '      kind: jit\n'
+            '      scope: "repo:example/notes-page write; telemetry read-only"\n'
+            '      issued_via: "CI OIDC exchange, 1h TTL, no standing secrets"',
+            "    credentials: {}")
+        self.assert_error(run_validator(self.repo), "GE-CRED-STANDING")
+
+    # -- a non-date `created` is caught despite format being an annotation --
+    def test_created_not_a_date(self):
+        self.edit(self.spec("ci-failure-explainer"),
+                  "created: 2026-08-20", "created: banana")
+        self.assert_error(run_validator(self.repo), "GE-SCHEMA")
+
 
 if __name__ == "__main__":
     unittest.main()

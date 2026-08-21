@@ -30,12 +30,16 @@ lives. Review this table when changing any of the referenced files.
 ## Non-waivable rules
 
 `governance/exceptions.yaml` can waive most validator rules with a named
-approver and an expiry. Two never bend, and the validator refuses exceptions
+approver and an expiry. Three never bend, and the validator refuses exceptions
 targeting them:
 
 - **`GE-FROZEN-WRITE`**: writes to frozen measurement instruments.
 - **`GE-SELF-APPROVE`**: a spec owner reviewing or receiving escalation for
   their own gates.
+- **`GE-HUMAN-ROLE`**: a governance role (owner, backup, reviewer, escalation
+  target, or kill-switch holder) held by a registered agent identity instead
+  of a human. A waivable version would let a spec owner self-approve putting an
+  agent identity in a review or kill-switch role.
 
 ## Hardening baseline
 
