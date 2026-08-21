@@ -11,9 +11,14 @@ warnings by an entry in
 [`governance/exceptions.yaml`](../governance/exceptions.yaml): named
 approver (who is not a party the waiver benefits, resolved for spec,
 agent, and registry-file targets alike), expiry ≤ 90 days, checked by
-CI. Two codes are **never waivable** and the validator refuses
-exceptions targeting them: `GE-FROZEN-WRITE` and `GE-SELF-APPROVE`
-([SECURITY.md](../SECURITY.md)).
+CI. **Never waivable**, and the validator refuses exceptions targeting
+them: `GE-FROZEN-WRITE` and `GE-SELF-APPROVE` (frozen instruments and
+separation of duties never bend), **and the whole `GE-EXC-*` family**:
+an exception cannot waive a finding about the exception register itself,
+or one actor could approve away the very check that catches their
+self-approval ([SECURITY.md](../SECURITY.md)). When a self-approved
+exception is voided, the error it targeted resurfaces as an error rather
+than being swallowed, so the remediation signal is never lost.
 
 ## What the validator does not check
 
@@ -120,7 +125,7 @@ than reaching for another exception:
 |------|-----------|-----|
 | `GE-EXC-INVALID` | An entry is malformed: missing fields, bad dates, duplicate id, empty approver list, or expiry more than 90 days from grant | Complete the entry per the template comments in [`exceptions.yaml`](../governance/exceptions.yaml) |
 | `GE-EXC-EXPIRED` | An entry's `expires` has passed | Remove it, or renew it consciously by PR; the underlying error is live again |
-| `GE-EXC-NONWAIVABLE` | An entry targets `GE-FROZEN-WRITE` or `GE-SELF-APPROVE` | Delete it; these never bend ([SECURITY.md](../SECURITY.md)) |
+| `GE-EXC-NONWAIVABLE` | An entry targets `GE-FROZEN-WRITE`, `GE-SELF-APPROVE`, or any `GE-EXC-*` code | Delete it; these never bend, and an exception cannot waive a finding about the register itself ([SECURITY.md](../SECURITY.md)) |
 | `GE-EXC-SELF` | An entry is approved by the target spec's own owner or backup | The waiver is void; an independent approver (security/identity owner or shared-services maintainer) must sign it |
 
 Warnings (never fail the build, still worth reading): a resource listed
