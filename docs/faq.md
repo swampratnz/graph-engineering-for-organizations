@@ -37,6 +37,25 @@ No. Same words, different field — see
 [the primer](what-is-graph-engineering.md#the-name-and-its-neighbors).
 No graph database is involved.
 
+**Shouldn't we build agents first and add governance once we have 5–10?**
+That sequencing is the documented failure pattern, not the prudent
+default. "Shadow agents are the default failure mode" — you cannot
+retrofit ownership onto agents nobody registered
+([OWASP NHI Top 10](https://owasp.org/www-project-non-human-identities-top-10/)) —
+and governance-as-afterthought is a recurring trait of the
+[~95% of pilots that produced no
+return](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/).
+The premise behind "later" is that governance is expensive; here it
+isn't: your first governed workflow costs
+[about an hour](tutorial-first-workflow.md) and three files, and the
+heavyweight machinery is [already deferred](paths/small-team.md) at
+small scale. What *is* honest to defer: if you're one person learning to
+build agent graphs, start with an engine's own tutorial (LangGraph,
+CrewAI) and experiment freely — then adopt this the day a second person,
+a real workload, or someone else's money is involved. Registering agent
+#1 takes minutes; inventorying agent #10 after the fact takes an
+investigation.
+
 **What does it cost?**
 The governance layer itself: a git repo and a CI job. The workflows:
 model spend is capped per run by each spec (`cap_per_run_usd`), and the

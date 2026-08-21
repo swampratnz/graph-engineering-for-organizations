@@ -6,7 +6,12 @@ CI-checked files. This repo is a practical guide to it **and** the
 operational repo you fork to do it: GRAPH SPECs reviewed like code, agent
 and resource registries, human gates with contracts, and a validator that
 fails the build when the governance stops being coherent — in effect, *a
-linter for your agent fleet's governance*. (Not graph databases — see
+linter for your agent fleet's governance*. It is **not an agent-building
+framework**: you bring your own engine — LangGraph, Temporal, Step
+Functions, plain GitHub Actions
+([crosswalk](docs/implementation-examples.md#runtime-crosswalk)) — and
+this repo is the contract and enforcement layer above it. (And not graph
+databases — see
 [the primer](docs/what-is-graph-engineering.md#the-name-and-its-neighbors).)
 
 ## The idea in three sentences
