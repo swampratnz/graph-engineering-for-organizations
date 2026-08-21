@@ -80,8 +80,9 @@ here; sources in §8. Vendor-published numbers are marked [vendor].
   Agent ID (GA April 2026) gives agents first-class directory identities
   with **no standing credentials — JIT scoped tokens**; OWASP's Non-Human
   Identities Top 10 names long-lived credentials as a root cause. Auditors
-  converge on the same first artifact: a versioned agent registry, because
-  "shadow agents are the default failure mode." The repo's
+  converge on the same first artifact: a versioned agent registry —
+  unregistered shadow agents being the default failure mode of
+  ungoverned adoption. The repo's
   `registry/agents.yaml` + `GE-CRED-STANDING` is this, already enforced.
 - Regulation: EU AI Act GPAI obligations live since Aug 2025; Article 50
   transparency since Aug 2026; the **Digital Omnibus (mid-2026) postponed

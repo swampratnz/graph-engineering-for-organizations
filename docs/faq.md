@@ -19,7 +19,8 @@ running a workflow is a parent issue and a gate issue. Compare the
 documented alternative: [~40% of agentic projects predicted canceled over
 risk controls and unclear value](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027),
 [~95% of GenAI pilots with no measurable
-return](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/).
+return](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/)
+(Aug 2025; methodology contested).
 The paperwork here is the treatment for the specific ways these projects
 die — and every piece of it (gate reasons, run records) is data you'll
 want anyway the first time something goes wrong at 2am.
@@ -39,12 +40,11 @@ No graph database is involved.
 
 **Shouldn't we build agents first and add governance once we have 5–10?**
 That sequencing is the documented failure pattern, not the prudent
-default. "Shadow agents are the default failure mode" — you cannot
-retrofit ownership onto agents nobody registered
-([OWASP NHI Top 10](https://owasp.org/www-project-non-human-identities-top-10/)) —
-and governance-as-afterthought is a recurring trait of the
-[~95% of pilots that produced no
-return](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/).
+default. Unregistered shadow agents are the default failure mode of
+build-first adoption — you cannot retrofit ownership onto agents nobody
+registered (see the
+[OWASP NHI Top 10](https://owasp.org/www-project-non-human-identities-top-10/)
+for the identity risks involved).
 The premise behind "later" is that governance is expensive; here it
 isn't: your first governed workflow costs
 [about an hour](tutorial-first-workflow.md) and three files, and the

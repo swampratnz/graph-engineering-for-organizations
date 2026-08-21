@@ -74,9 +74,10 @@ who approved what, when, and why. The
 [incident runbook](../runbooks/incident-response.md) starts from those
 files, and [decision rights](../../governance/decision-rights.md) settles
 the rest (stop needs no approval; restart does). The inverse case is the
-one to fear: ["shadow agents are the default failure
-mode"](https://owasp.org/www-project-non-human-identities-top-10/) — an
-agent nobody registered, doing something nobody owns.
+one to fear — an unregistered shadow agent: nobody's inventory, nobody's
+owner, doing something nobody can stop (the identity-risk class the
+[OWASP NHI Top 10](https://owasp.org/www-project-non-human-identities-top-10/)
+catalogs).
 
 ## "How many reviewers does a fleet need — and when can the human come out?"
 
