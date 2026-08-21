@@ -70,10 +70,11 @@ sturdier review structure than two people alone ever was.
 ## Your first workflow
 
 Prescribed, not a menu — the evidence says pick **one** narrow,
-recurring, internal-facing chore and measure it
-([MIT's study of failed pilots](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/):
-the ~95% automated broadly and shallowly; the winners went narrow and
-deep). Best-evidenced starters:
+recurring, internal-facing chore and measure it: in
+[MIT's study of failed pilots](https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/)
+(Aug 2025; methodology contested), the failing majority automated
+broadly and shallowly while the winners went narrow and deep.
+Best-evidenced starters:
 
 | Workflow | Why it works first |
 |----------|--------------------|
