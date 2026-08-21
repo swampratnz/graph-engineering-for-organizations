@@ -1,6 +1,6 @@
 # Graph Engineering for Teams: Organizational Implementation Plan
 
-Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph workflows across an organization with multiple humans interacting. Written generically — adopting organizations map the roles and systems named here onto their own.
+Prepared: 20 Aug 2026. Research-grounded plan for running multi-agent graph workflows across an organization with multiple humans interacting. Written generically: adopting organizations map the roles and systems named here onto their own.
 
 ## What the research says (condensed)
 
@@ -30,7 +30,7 @@ this document.
 
 **Agent identity and registry.** Every agent/workflow gets: unique identity (no shared credentials, no impersonation of humans), named human owner, scoped JIT credentials, kill switch, entry in a central registry. Extend existing IAM/PAM rather than a parallel stack; if the org already has an AI/agent identity policy, this phase operationalizes it. Named owner: the security/identity owner.
 
-**Anchor definition.** Per team (or business unit): a one-page objective/anchor table. Objectives are what graphs optimize; anchors are external signals used to verify (cash landed, churn, customer-found incidents, third-party seeds, frozen-config telemetry). This table sets the autonomy ceiling per workflow, and is a leadership-level artifact — reviewed at whatever level owns the objectives it encodes.
+**Anchor definition.** Per team (or business unit): a one-page objective/anchor table. Objectives are what graphs optimize; anchors are external signals used to verify (cash landed, churn, customer-found incidents, third-party seeds, frozen-config telemetry). This table sets the autonomy ceiling per workflow, and is a leadership-level artifact, reviewed at whatever level owns the objectives it encodes.
 
 **Cost plumbing.** Per-run and per-team attribution, hard caps per run, alerts on anomalous spend. Do this before adoption, not after the first surprise bill. Dynamic workflows consume meaningfully more than normal sessions by design.
 
@@ -117,13 +117,13 @@ Retrofitted 2026-08 (see `docs/practical-guide-design.md` §8.5): claims
 above are either cited here or labeled planning assumptions. Vendor
 numbers flagged [vendor].
 
-1. **Adoption gap is organizational** — Gartner, [>40% of agentic
+1. **Adoption gap is organizational**: Gartner, [>40% of agentic
    projects canceled by end-2027 over costs/value/risk
    controls](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027)
    (Jun 2025); McKinsey State of AI (Nov 2025): 23% scaling agents, 39%
    experimenting; MIT NANDA (Aug 2025, methodology contested): ~95% of
    pilots without P&L impact, attributed to adoption mismanagement.
-2. **Review capacity as binding constraint** — the 2-3 / 10-20
+2. **Review capacity as binding constraint**: the 2-3 / 10-20
    supervised-agent figures are **planning assumptions**, not measured
    results; treat them as defaults to re-baseline against your own
    review-load metric (`metrics/gate-health.md` §6). Published support
@@ -133,34 +133,34 @@ numbers flagged [vendor].
    case](https://aipatternbook.com/approval-fatigue), and 59.8% of
    builders relying on human review
    ([LangChain, Dec 2025](https://www.langchain.com/state-of-agent-engineering)).
-3. **Durable execution** — [LangGraph
+3. **Durable execution**: [LangGraph
    `interrupt()`/checkpointer](https://www.langchain.com/blog/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt)
    and [Temporal signals/event
    sourcing](https://temporal.io/blog/announcing-openai-agents-sdk-integration)
    as reference implementations.
-4. **Idempotency** — standard durable-execution practice (Temporal
+4. **Idempotency**: standard durable-execution practice (Temporal
    activity semantics); stated here as a design rule.
-5. **Distribution via plugins** — product capability of the Claude
+5. **Distribution via plugins**: product capability of the Claude
    stack; verify against current vendor docs at adoption time [vendor].
-6. **Agent identity gap** — [OWASP Non-Human Identities Top
+6. **Agent identity gap**: [OWASP Non-Human Identities Top
    10](https://owasp.org/www-project-non-human-identities-top-10/)
    (2025); [Microsoft Entra Agent
    ID](https://learn.microsoft.com/en-us/entra/agent-id/) (JIT,
    no-standing-credential agent identities, GA 2026); the
    Salesloft-Drift breach as the canonical failure pattern.
-7. **Regulation** — [EU AI Act Article 14 (human oversight, safe
+7. **Regulation**: [EU AI Act Article 14 (human oversight, safe
    interrupt)](https://artificialintelligenceact.eu/article/14/); GPAI
    obligations live Aug 2025; high-risk obligations postponed to Dec
    2027 / Aug 2028 by the mid-2026 Digital Omnibus
-   ([analysis](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/))
-   — re-verify dates before relying on them.
-8. **Multi-agent pathologies** — cataloged in [OWASP's agentic threat
+   ([analysis](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/));
+   re-verify dates before relying on them.
+8. **Multi-agent pathologies**: cataloged in [OWASP's agentic threat
    corpus](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/)
    (cascading failures, HITL flooding); sycophancy-cascade and
    non-convergence specifics are **planning assumptions** drawn from the
-   multi-agent literature — the guards (round caps, group ceilings,
+   multi-agent literature; the guards (round caps, group ceilings,
    fresh-context verifiers) are cheap regardless.
-9. **Selective validation works** — tiered/risk-based oversight with
+9. **Selective validation works**: tiered/risk-based oversight with
    sampled review as converging practice
    ([CSA autonomy levels, Jan 2026](https://cloudsecurityalliance.org/blog/2026/01/28/levels-of-autonomy));
    high automation rates with exception-routing are widely reported by

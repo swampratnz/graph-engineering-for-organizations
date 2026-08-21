@@ -4,7 +4,7 @@ Working state of the phased rollout in `docs/plan.md`. Check items off via PR
 so the history shows when each gate was passed and on what evidence. Do not
 start a phase before the previous phase's exit criteria are checked.
 
-## Phase 0 — Foundations (weeks 0-4)
+## Phase 0: Foundations (weeks 0-4)
 
 - [ ] Agent identity policy adopted; registry live (`registry/agents.yaml`)
       and wired into existing IAM/PAM, not a parallel stack
@@ -18,7 +18,7 @@ start a phase before the previous phase's exit criteria are checked.
       by the runtime; anomaly alerts firing to owners
 - [ ] This spec repo live with CI validation on every PR
 
-## Phase 1 — Single-player graphs, shared library (weeks 4-10)
+## Phase 1: Single-player graphs, shared library (weeks 4-10)
 
 - [ ] Engineers running scoped dynamic workflows with caps, first-run
       confirmation on
@@ -29,7 +29,7 @@ start a phase before the previous phase's exit criteria are checked.
 - [ ] Cost-per-run baselines recorded in each promoted spec
 - [ ] At least one workflow with a measured quality anchor
 
-## Phase 2 — Durable multi-human graphs (months 2-4)
+## Phase 2: Durable multi-human graphs (months 2-4)
 
 - [ ] Pilot workflow selected: one team, one recurring cross-boundary
       workflow that already exists
@@ -42,7 +42,7 @@ start a phase before the previous phase's exit criteria are checked.
 - [ ] Run records logged per `schemas/run-record.schema.json`
 - [ ] Metrics tooling exists: something (a script, a saved query, a
       spreadsheet fed from ticket exports) actually computes the
-      `metrics/gate-health.md` numbers from run data — the success gate
+      `metrics/gate-health.md` numbers from run data; the success gate
       below depends on four of them, and prose definitions don't
       compute themselves
 - [ ] Four weeks of pilot metrics collected
@@ -55,10 +55,10 @@ start a phase before the previous phase's exit criteria are checked.
 - [ ] External anchor moved or held
 
 If latency blows out or override rate sits at zero: the constraint is review
-capacity or gate design. Invest in fewer/better gates or more anchors — not
+capacity or gate design. Invest in fewer/better gates or more anchors, not
 more orchestration infrastructure.
 
-## Phase 3 — Scaling oversight (months 4-6)
+## Phase 3: Scaling oversight (months 4-6)
 
 - [ ] Sampling enabled only where decision-rights evidence exists;
       irreversible/externally visible actions still 100% gated
@@ -72,7 +72,7 @@ more orchestration infrastructure.
 ## Phase 3+ backlog (scheduled, not started)
 
 - [ ] **Registry-vs-reality reconciliation job.** The registries document
-      intent; IAM enforces it — and nothing yet detects drift between the
+      intent; IAM enforces it, and nothing yet detects drift between the
       two (an agent deleted here but alive in the identity provider, a
       frozen instrument that quietly regained a writer, a standing PAT
       behind a `kind: jit` entry). A scheduled job diffing actual

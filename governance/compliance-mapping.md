@@ -1,7 +1,7 @@
 # Compliance mapping
 
 Where this repo's artifacts line up with the frameworks an enterprise audit
-will ask about. This is a mapping aid for auditors and implementers — it is
+will ask about. This is a mapping aid for auditors and implementers; it is
 **not legal advice and not a conformity claim**. Whether a given workflow is
 in scope (e.g. "high-risk" under the EU AI Act) is a legal determination the
 org makes with counsel; this table shows which artifact answers which

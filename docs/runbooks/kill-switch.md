@@ -9,18 +9,18 @@ The security/identity owner or the spec's DRI, per the agent's
 whether you're authorized and you believe an agent is misbehaving or
 compromised: pull it anyway and page the security owner. A wrongly stopped
 workflow costs hours; a compromised agent credential is the Salesloft-Drift
-pattern — its activity is indistinguishable from legitimate use until you
+pattern: its activity is indistinguishable from legitimate use until you
 look.
 
 ## Stop (no approval)
 
 1. **Revoke credentials first.** Execute the agent's `kill_switch.how` from
-   the registry entry — revoke the token/trust binding at the identity
+   the registry entry: revoke the token/trust binding at the identity
    provider. Registry edits alone don't stop a running process.
 2. **Halt in-flight runs.** Cancel the runtime's active runs for the spec
    (close the parent issue for ticket-based runs; terminate the
    LangGraph/Temporal execution otherwise). Mark run records `killed`.
-3. **Record it.** PR (or direct commit in an emergency — this is the one
+3. **Record it.** PR (or direct commit in an emergency; this is the one
    allowed case) setting the agent's `status: disabled` in
    `registry/agents.yaml`, with when/who/why in the commit message.
 4. **Notify** the spec owner, the gate reviewers with pending gates, and the

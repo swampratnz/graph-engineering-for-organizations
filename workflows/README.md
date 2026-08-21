@@ -1,7 +1,7 @@
 # Workflow scripts
 
 Executable workflow scripts promoted from good runs (Phase 1). A script lands
-here only alongside a GRAPH SPEC in `specs/` — the spec is the contract, the
+here only alongside a GRAPH SPEC in `specs/`; the spec is the contract, the
 script is one implementation of it.
 
 Layout:
@@ -26,5 +26,5 @@ Rules:
   repository.
 - A script whose spec is `deprecated` or `killed` gets deleted in the same
   PR that changes the spec status.
-- Side-effect nodes derive idempotency keys from `(run_id, step_id)` — a
+- Side-effect nodes derive idempotency keys from `(run_id, step_id)`; a
   script that can't safely retry a side effect doesn't get promoted.

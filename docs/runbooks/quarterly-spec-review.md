@@ -5,7 +5,7 @@ shared services maintainer runs this; output is one PR plus a short summary.
 
 ## Steps
 
-1. **Run the validator.** `python3 scripts/validate.py` — any spec past its
+1. **Run the validator.** `python3 scripts/validate.py`; any spec past its
    `review_by` date is already flagged as orphaned.
 2. **Re-verify owners.** Message every spec `owner` and `backup_owner`: "still
    yours?" No answer in a week = orphaned. Orphaned specs get 2 weeks to find
@@ -23,12 +23,12 @@ shared services maintainer runs this; output is one PR plus a short summary.
 5. **Registry hygiene and recertification.** Agents whose specs are
    killed/deprecated → `retired`, credentials destroyed. For every active
    agent: re-verify owner, credential scopes, and kill switch, then bump
-   its `review_by` (+3 months) — a lapsed date fails CI. Resources no spec
+   its `review_by` (+3 months); a lapsed date fails CI. Resources no spec
    references → removed or marked. Anchor tables past their review date →
    back to their owners.
 6. **Exception register.** Every entry in `governance/exceptions.yaml`
    is re-justified or removed. Expired and unused entries are already
-   flagged by CI; anything renewed a second time is a standing gap —
+   flagged by CI; anything renewed a second time is a standing gap;
    fix the underlying cause or accept it explicitly in decision-rights
    terms, not by serial renewal.
 7. **Platform hardening re-check.** Re-verify `docs/platform-hardening.md`
