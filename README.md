@@ -19,7 +19,8 @@ databases; see
 Human review capacity, not model capability, is the binding constraint on
 agent fleets, so humans are modeled as graph nodes with contracts (structured
 input, approve/reject/modify output, explicit timeout behavior). Agent
-autonomy scales with external anchor density, never with internal metrics.
+autonomy scales with [external anchor density](docs/glossary.md), never
+with internal metrics.
 Everything that enforces this (identity, gates, costs, frozen instruments,
 ownership) is declared in versioned files here and checked by CI on every PR.
 
@@ -157,6 +158,18 @@ the artifacts here to the EU AI Act, NIST AI RMF, ISO/IEC 42001, and SOC 2.
 pip install -r requirements.txt
 python3 scripts/validate.py
 ```
+
+## Project status
+
+Young, and honest about it: created August 2026, currently seeking its
+first external pilot team, and the example teams are fictional until a
+real pilot's metrics replace them. What you adopt is a discipline plus a
+small, auditable enforcement layer (one validator, two pinned
+dependencies) that you fork and own; there is no runtime dependency on
+upstream, so upstream's age or activity never puts your deployment at
+risk. Tutorial run results are logged in
+[`metrics/tutorial-runs.md`](metrics/tutorial-runs.md). If you run a
+pilot, open an issue: the first case-study slot is yours.
 
 ## License
 

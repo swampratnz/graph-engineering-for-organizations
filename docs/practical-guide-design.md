@@ -291,7 +291,7 @@ people to mean anything.
 zero governance decisions (defaults pre-made), ends with the reader's own
 spec passing `validate.py`. Steps: (1) fork/clone, install, run the
 validator green: 10 min, first success; (2) read the minimal reference
-spec (`ci-failure-explainer`, §3.5) next to its ~30 frontmatter lines;
+spec (`ci-failure-explainer`, §3.5) next to its ~50 frontmatter lines;
 (3) **break it on purpose**: make the owner a gate reviewer
 (`GE-SELF-APPROVE`), write to a frozen resource (`GE-FROZEN-WRITE`),
 drop a timeout, and read each error. The top-3-errors pattern from
@@ -389,8 +389,9 @@ the evidenced *entry* workflow class is missing: **comment-only,
 internal-facing, low blast radius** (CI-failure explanations, triage
 notes). Adding it as a third validated spec gives:
 
-- a genuinely minimal copy-me (~30 frontmatter lines) for the tutorial,
-  CI-validated so it can never drift from the validator;
+- a genuinely minimal copy-me (about 50 frontmatter lines as delivered)
+  for the tutorial, CI-validated so it can never drift from the
+  validator;
 - the missing bottom rung of the ladder, making the three specs the
   ladder's three live rungs (§3.6);
 - a worked example of **batch gating** (a weekly digest gate over the

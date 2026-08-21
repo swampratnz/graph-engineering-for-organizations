@@ -121,8 +121,10 @@ numbers flagged [vendor].
    projects canceled by end-2027 over costs/value/risk
    controls](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027)
    (Jun 2025); McKinsey State of AI (Nov 2025): 23% scaling agents, 39%
-   experimenting; MIT NANDA (Aug 2025, methodology contested): ~95% of
-   pilots without P&L impact, attributed to adoption mismanagement.
+   experimenting; MIT NANDA (Aug 2025; methodology contested, see
+   [Futuriom's critique](https://www.futuriom.com/articles/news/why-we-dont-believe-mit-nandas-werid-ai-study/2025/08)):
+   ~95% of pilots without P&L impact, attributed to a learning gap and
+   generic tools that don't adapt to workflows.
 2. **Review capacity as binding constraint**: the 2-3 / 10-20
    supervised-agent figures are **planning assumptions**, not measured
    results; treat them as defaults to re-baseline against your own

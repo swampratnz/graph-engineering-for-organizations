@@ -3,7 +3,7 @@
 
 Executes one run of a GRAPH SPEC as local files that mirror the
 ticket-based runtime (docs/implementation-examples.md §1): a parent
-"issue", one child "gate issue" per gate, and — the part that matters —
+"issue", one child "gate issue" per gate, and, the part that matters,
 gate decisions and a closing run record validated against this repo's
 schemas. It exists so the contract is executable end-to-end with zero
 infrastructure; wiring the same lifecycle to real GitHub/Jira issues
@@ -61,7 +61,7 @@ def jsonable(value):
 def load_spec(path: Path) -> dict:
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---"):
-        die(f"{path} has no YAML frontmatter — is it a GRAPH SPEC?")
+        die(f"{path} has no YAML frontmatter; is it a GRAPH SPEC?")
     fm = yaml.safe_load(text.split("\n---", 2)[0].lstrip("-").lstrip("\n"))
     if not isinstance(fm, dict):
         die(f"{path}: frontmatter did not parse to a mapping")
@@ -75,7 +75,7 @@ def make_validator(schema_name: str):
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
-        print("WARNING jsonschema not installed — records written without "
+        print("WARNING jsonschema not installed; records written without "
               "schema validation (pip install -r requirements.txt)")
         return None
     schema = json.loads((SCHEMAS / schema_name).read_text(encoding="utf-8"))
@@ -112,7 +112,7 @@ def run_dir(runs_root: Path, run_id: str) -> Path:
 def load_state(runs_root: Path, run_id: str) -> dict:
     path = run_dir(runs_root, run_id) / "state.json"
     if not path.exists():
-        die(f"no run {run_id!r} under {runs_root}/ — start it first")
+        die(f"no run {run_id!r} under {runs_root}/; start it first")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -131,7 +131,7 @@ def render_parent(d: Path, state: dict) -> None:
         f"Agent: {', '.join(fm.get('agents', []))}",
         f"Status: {state['status']}",
         f"Spend: ${state['spend_usd']:.2f} / cap ${fm['cost']['cap_per_run_usd']:.2f}",
-        "- [x] do the work (you or your coding agent — paste the artifact here)",
+        "- [x] do the work (you or your coding agent; paste the artifact here)",
     ]
     for g in fm.get("gates") or []:
         mark = "x" if g["id"] in decided else " "
@@ -147,7 +147,7 @@ def cmd_start(args) -> None:
     run_id = args.run_id or f"{fm['name']}-{datetime.date.today().isoformat()}"
     d = run_dir(args.runs_dir, run_id)
     if d.exists():
-        die(f"run dir {d} already exists — pass --run-id for a distinct run")
+        die(f"run dir {d} already exists; pass --run-id for a distinct run")
     d.mkdir(parents=True)
     for g in fm.get("gates") or []:
         esc = (f"escalates to @{g['escalate_to']}" if g.get("on_timeout") == "escalate"
@@ -156,7 +156,7 @@ def cmd_start(args) -> None:
             f"Title: [gate] {g['id']} for {run_id} "
             f"(assignee: @{', @'.join(g.get('reviewers', []))})\n\n"
             "Artifact: <paste the artifact and the minimum context to judge "
-            "it — never the worker agent's full transcript>\n"
+            "it; never the worker agent's full transcript>\n"
             "Reply by running:\n"
             f"  python3 scripts/ticket_runner.py decide --run {run_id} "
             f"--gate {g['id']} --by <you> --decision approve|reject|modify "
@@ -190,10 +190,10 @@ def cmd_decide(args) -> None:
                     "decided_by": "timeout", "decided_at": now()}
     else:
         if by == str(fm.get("owner", "")).casefold():
-            die(f"{args.by} owns this spec — authors never resolve their own "
+            die(f"{args.by} owns this spec; authors never resolve their own "
                 "gates (GE-SELF-APPROVE, non-waivable)")
         if by == str(fm.get("backup_owner", "")).casefold():
-            print(f"WARNING: {args.by} is the backup owner — CI allows this "
+            print(f"WARNING: {args.by} is the backup owner; CI allows this "
                   "only under an exception with an outside approver "
                   "(docs/paths/small-team.md)")
         allowed = {r.casefold() for r in gate.get("reviewers", [])}
@@ -222,7 +222,7 @@ def cmd_decide(args) -> None:
         state["status"] = "running"
     save_state(args.runs_dir, state)
     print(f"gate {args.gate}: {decision['decision']} by {decision['decided_by']} "
-          f"— recorded, schema-valid")
+          f"(recorded, schema-valid)")
 
 
 def cmd_complete(args) -> None:
@@ -231,11 +231,11 @@ def cmd_complete(args) -> None:
     undecided = [g["id"] for g in fm.get("gates") or []
                  if not any(d["gate_id"] == g["id"] for d in state["gates"])]
     if undecided and args.status == "completed":
-        die(f"gate(s) {undecided} undecided — decide them (or record their "
+        die(f"gate(s) {undecided} undecided; decide them (or record their "
             "timeout with --timed-out) before completing")
     status = args.status
     if args.spend > cap:
-        print(f"WARNING: spend ${args.spend} exceeds cap ${cap} — status "
+        print(f"WARNING: spend ${args.spend} exceeds cap ${cap}; status "
               "forced to cap_exceeded (the cap is a hard stop)")
         status = "cap_exceeded"
     rejected = any(d["decision"] == "reject" for d in state["gates"])
@@ -255,7 +255,7 @@ def cmd_complete(args) -> None:
     (d / "run-record.json").write_text(json.dumps(record, indent=2) + "\n",
                                        encoding="utf-8")
     save_state(args.runs_dir, state)
-    print(f"run {state['run_id']} closed: {status}, ${args.spend:.2f} — "
+    print(f"run {state['run_id']} closed: {status}, ${args.spend:.2f}; "
           f"schema-valid run record at {d / 'run-record.json'}")
 
 
