@@ -23,6 +23,18 @@ autonomy scales with external anchor density, never with internal metrics.
 Everything that enforces this — identity, gates, costs, frozen instruments,
 ownership — is declared in versioned files here and checked by CI on every PR.
 
+## Is this for you?
+
+| Probably not yet | Fork it |
+|------------------|---------|
+| You're **one person** experimenting on a laptop — separation of duties needs a second human, so learn an engine first (LangGraph, CrewAI, the Claude Agent SDK) and bring the concepts back when a second person or a real workload arrives | You're **two or more people** with even one recurring agent workflow — the minimum footprint is three files and one CI check, about [an hour](docs/tutorial-first-workflow.md), and [most machinery stays dormant](docs/paths/small-team.md) at small scale |
+| You're building a one-off demo with no side effects | Agents touch anything real — money, production, customer-visible output, your dependencies — or you're about to let them |
+| Nothing here will ever be audited, and nobody else's money is involved | Security or legal is blocking AI adoption — this repo *is* the evidence pack that unblocks it, produced as a by-product of running |
+
+Governance isn't the thing to defer: registering agent #1 takes minutes;
+inventorying agent #10 after the fact takes an investigation
+([why](docs/faq.md)).
+
 ## Start here: three doors
 
 | You want to… | Go to | Time |
