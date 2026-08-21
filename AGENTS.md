@@ -101,8 +101,9 @@ Collect from the humans:
    token, no force pushes). You cannot set these from files; produce the
    checklist for the human and verify afterwards what you can via the API.
 4. Decide whether the bundled `example-team` files stay as reference or are
-   deleted; if deleted, remove the spec, its agents/resources entries, and
-   `governance/anchors/example-team.md` together so the validator stays
+   deleted; if deleted, remove the specs, their agents/resources entries,
+   and both `governance/anchors/example-team.md` and its machine-readable
+   `governance/anchors/example-team.yaml` together so the validator stays
    green.
 
 ### Phase C: Foundations (mirrors Phase 0 of `docs/plan.md`)

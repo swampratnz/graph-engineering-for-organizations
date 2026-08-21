@@ -9,10 +9,47 @@ against it (a `--list-codes` flag to mechanize the diff is on the
 **How waiving works:** most errors can be temporarily downgraded to
 warnings by an entry in
 [`governance/exceptions.yaml`](../governance/exceptions.yaml): named
-approver (who is *not* the target spec's owner or backup), expiry ≤ 90
-days, checked by CI. Two codes are **never waivable** and the validator
-refuses exceptions targeting them: `GE-FROZEN-WRITE` and
-`GE-SELF-APPROVE` ([SECURITY.md](../SECURITY.md)).
+approver (who is not a party the waiver benefits, resolved for spec,
+agent, and registry-file targets alike), expiry ≤ 90 days, checked by
+CI. Two codes are **never waivable** and the validator refuses
+exceptions targeting them: `GE-FROZEN-WRITE` and `GE-SELF-APPROVE`
+([SECURITY.md](../SECURITY.md)).
+
+## What the validator does not check
+
+The validator proves the files are internally coherent. It is not a
+runtime and it does not reach outside the repo, so these are checked by
+the platform, the runtime, or human review, never by CI. Adopters should
+read this as the honest boundary of the green checkmark:
+
+- **That a handle is a real person, or holds the role it claims.** The
+  validator compares strings; `security-owner` or a reviewer handle could
+  be nobody. Personhood and role are enforced by PR review, CODEOWNERS +
+  branch protection, and gate assignment ([FAQ](faq.md)); there is no
+  machine roster of role-holders yet (a plausible `governance/roles.yaml`
+  is unbuilt, called out here so its absence is explicit, not implied).
+- **The real credential behind a `kind: jit` entry.** A standing token
+  hiding behind a `jit` string passes; the
+  [registry-vs-IAM reconciliation job](rollout-checklist.md#phase-3-backlog-scheduled-not-started)
+  is the (unbuilt) control, and `docs/platform-hardening.md` is the
+  interim.
+- **That frozen-instrument write access is actually revoked** in the
+  measuring system's own IAM (`platform-hardening.md`).
+- **That the runtime honours** `cap_per_run_usd`, timeouts, `on_timeout`,
+  the sampling rate, or idempotency keys. The spec declares intent; the
+  engine enforces it (`AGENTS.md` Phase C.4).
+- **The four-weeks-of-metrics evidence** for an autonomy increase: the
+  validator checks `anchor_class: external` and defined anchors; the
+  metrics half is a PR-description requirement
+  ([decision-rights](../governance/decision-rights.md)).
+- **Spec prose, or free-text fields** (`kill_switch.how`,
+  `credentials.scope`, `issued_via`): shape is checked, content is not.
+- **Prompt injection through processed data**: no spec fixes it; gate
+  contracts and blast-radius limits are the mitigation
+  ([enterprise path](paths/enterprise.md)).
+- **Branch protection and CODEOWNERS enforcement themselves**: GitHub
+  settings, not files. Without them everything here is advisory
+  ([SECURITY.md](../SECURITY.md) hardening baseline).
 
 ## Structural
 
