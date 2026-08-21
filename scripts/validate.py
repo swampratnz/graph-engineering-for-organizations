@@ -104,10 +104,19 @@ def rel(path: Path | str) -> str:
         return Path(path).as_posix()
 
 
+def waivable(code: str) -> bool:
+    """An exception can waive a policy finding, but never one of the two
+    never-bend rules, and never a finding about the exception register
+    itself. An exception that could waive GE-EXC-* would let a single actor
+    approve away the very check that catches their self-approval, so the
+    whole GE-EXC-* family is non-waivable."""
+    return code not in NON_WAIVABLE and not code.startswith("GE-EXC-")
+
+
 def err(path: Path | str, code: str, msg: str, target: str | None = None) -> None:
     """Record an error unless an active exception waives it (then warn)."""
     for key in ((target, code) if target else (None,), (rel(path), code)):
-        if key in active_exceptions and code not in NON_WAIVABLE:
+        if key in active_exceptions and waivable(code):
             exc_id = active_exceptions[key]
             used_exceptions.add(exc_id)
             warnings.append(f"WAIVED  {rel(path)}: [{code}] {msg} "
@@ -166,6 +175,13 @@ def load_exceptions() -> None:
             err(EXCEPTIONS_PATH, "GE-EXC-NONWAIVABLE",
                 f"exception {exc_id!r} targets non-waivable code {code}; "
                 "frozen instruments and separation of duties never bend")
+            continue
+        if code.startswith("GE-EXC-"):
+            err(EXCEPTIONS_PATH, "GE-EXC-NONWAIVABLE",
+                f"exception {exc_id!r} targets {code}; an exception cannot "
+                "waive a finding about the exception register itself, or a "
+                "single actor could approve away the check that catches "
+                "their own self-approval")
             continue
         approvers = entry["approved_by"]
         if not isinstance(approvers, list) or not approvers:
@@ -230,6 +246,10 @@ def prune_self_approved_exceptions(specs: list[tuple[Path, dict]],
             err(EXCEPTIONS_PATH, "GE-EXC-SELF",
                 f"exception {exc_id!r} approved by {bad}; a party the waiver "
                 f"of {target!r} benefits cannot approve it; the waiver is void")
+            # Fully remove the voided waiver from matching so the error it
+            # would have waived resurfaces as an error, not a swallowed
+            # warning. GE-EXC-SELF itself is non-waivable (see waivable()), so
+            # this finding cannot in turn be waived away.
             active_exceptions.pop((target, str(entry["code"])), None)
 
 
@@ -620,7 +640,6 @@ def main() -> int:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     agents = load_registry(AGENTS_PATH, "agents")
     resources = load_registry(RESOURCES_PATH, "resources")
-    anchor_tables = load_anchor_tables(resources)
     agent_ids = {norm(a) for a in agents}
 
     if not CODEOWNERS_PATH.exists():
@@ -645,11 +664,14 @@ def main() -> int:
                     f"duplicate spec name {name!r} (also in {rel(names[name])})")
             names[name] = path
 
-    # Void self-approved exceptions BEFORE any waivable check runs; the
-    # agent-registry checks (GE-CRED-STANDING, GE-AGENT-RECERT) are waivable
-    # and must consult the pruned register, so they follow the prune.
+    # Void self-approved exceptions BEFORE any waivable check runs. A voided
+    # exception is popped from the register inside prune, so its target error
+    # resurfaces instead of being silently swallowed; and every waivable check
+    # (agent registry, anchor tables, pass 2) runs after the prune so none can
+    # consult a register entry that is about to be voided.
     prune_self_approved_exceptions(specs, agents)
     check_agent_registry(agents)
+    anchor_tables = load_anchor_tables(resources)
 
     # Pass 2: checks (err() consults the pruned exception register).
     for path, fm in specs:

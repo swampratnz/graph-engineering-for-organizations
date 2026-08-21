@@ -143,6 +143,55 @@ class ValidatorCase(unittest.TestCase):
                             .replace("GE-CRED-STANDING", "GE-SELF-APPROVE"))
         self.assert_error(run_validator(self.repo), "GE-EXC-NONWAIVABLE")
 
+    # -- the chained GE-EXC-SELF bypass and its two guards -----------------
+    def test_chained_exc_self_waiver_is_rejected(self):
+        # EXC-A self-approves a standing-credential waiver; EXC-B tries to
+        # waive the GE-EXC-SELF finding that catches EXC-A. Single actor
+        # (alice owns example-release-bot). EXC-B must be rejected because
+        # GE-EXC-* is non-waivable, and the run must fail.
+        self._standing_release_bot()
+        self.set_exceptions(
+            "exceptions:\n"
+            "  - id: EXC-A\n"
+            "    code: GE-CRED-STANDING\n"
+            "    target: example-release-bot\n"
+            "    approved_by: [alice]\n"
+            "    reason: self-approved waiver\n"
+            "    granted: 2026-08-21\n"
+            "    expires: 2026-11-01\n"
+            "  - id: EXC-B\n"
+            "    code: GE-EXC-SELF\n"
+            "    target: governance/exceptions.yaml\n"
+            "    approved_by: [alice]\n"
+            "    reason: waive the void finding itself\n"
+            "    granted: 2026-08-21\n"
+            "    expires: 2026-11-01\n")
+        res = run_validator(self.repo)
+        self.assertEqual(res.returncode, 1, res.stdout)
+        self.assertIn("GE-EXC-NONWAIVABLE", res.stdout)
+        self.assertIn("EXC-B", res.stdout)
+        # And the self-approval it tried to shield is still an error.
+        self.assertIn("GE-EXC-SELF", res.stdout)
+
+    def test_void_exception_does_not_suppress_target(self):
+        # A voided self-approved waiver must not swallow the error it targeted;
+        # both the void finding and the underlying credential error surface.
+        self._standing_release_bot()
+        self.set_exceptions(self._exc("example-release-bot", "alice"))
+        res = run_validator(self.repo)
+        self.assertEqual(res.returncode, 1, res.stdout)
+        self.assertIn("GE-EXC-SELF", res.stdout)
+        self.assertIn("GE-CRED-STANDING", res.stdout)
+        self.assertNotIn("WAIVED", res.stdout)
+
+    def test_exception_with_ge_exc_code_rejected(self):
+        # An exception whose code is itself in the GE-EXC-* family is rejected
+        # at parse time, even with a genuinely independent approver.
+        self.set_exceptions(
+            self._exc("governance/exceptions.yaml", "security-owner")
+            .replace("GE-CRED-STANDING", "GE-EXC-SELF"))
+        self.assert_error(run_validator(self.repo), "GE-EXC-NONWAIVABLE")
+
 
 if __name__ == "__main__":
     unittest.main()

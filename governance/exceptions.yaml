@@ -18,7 +18,11 @@
 #     is no machine roster of role-holders yet; see the FAQ).
 #   - expires is mandatory, max 90 days out from granted; an expired entry
 #     is a CI error until removed or consciously renewed by PR
-#   - non-waivable codes (GE-FROZEN-WRITE, GE-SELF-APPROVE) are rejected
+#   - non-waivable codes are rejected: GE-FROZEN-WRITE and GE-SELF-APPROVE
+#     (frozen instruments and separation of duties never bend), and the whole
+#     GE-EXC-* family (an exception cannot waive a finding about the exception
+#     register itself, or one actor could approve away the very check that
+#     catches their self-approval)
 #   - an exception matching no current error is flagged so the register
 #     stays clean
 #
