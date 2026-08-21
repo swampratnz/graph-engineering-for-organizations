@@ -9,20 +9,23 @@
 # Rules (validated by scripts/validate.py):
 #   - every entry: id, target, code, reason, approved_by, granted, expires
 #   - approved_by must name the security/identity owner or the shared
-#     services maintainer (a human handle). CI voids an exception approved
-#     by a party the waiver benefits (GE-EXC-SELF): the target spec's owner
-#     or backup for a spec-name target, the agent's owner for an agent-id
-#     target, any agent owner for a registry-file target. The validator
-#     compares handle strings; reviewers still confirm the approver is a
-#     real human who actually holds one of the two privileged roles (there
-#     is no machine roster of role-holders yet; see the FAQ).
+#     services maintainer (a human handle, ASCII [a-z0-9][a-z0-9-]*; a
+#     padded or look-alike string is rejected as invalid). CI voids an
+#     exception approved by a party the waiver benefits (GE-EXC-SELF): the
+#     spec's owner or backup for a spec-name OR spec-file target, the
+#     agent's owner for an agent-id target, and every owner in the file for
+#     a registry or anchor-file target. The validator compares handle
+#     strings; reviewers still confirm the approver is a real human who
+#     actually holds one of the two privileged roles (there is no machine
+#     roster of role-holders yet; see the FAQ).
 #   - expires is mandatory, max 90 days out from granted; an expired entry
 #     is a CI error until removed or consciously renewed by PR
-#   - non-waivable codes are rejected: GE-FROZEN-WRITE and GE-SELF-APPROVE
-#     (frozen instruments and separation of duties never bend), and the whole
-#     GE-EXC-* family (an exception cannot waive a finding about the exception
-#     register itself, or one actor could approve away the very check that
-#     catches their self-approval)
+#   - non-waivable codes are rejected: GE-FROZEN-WRITE, GE-SELF-APPROVE, and
+#     GE-HUMAN-ROLE (frozen instruments, separation of duties, and human-only
+#     governance roles never bend), and the whole GE-EXC-* family (an
+#     exception cannot waive a finding about the exception register itself, or
+#     one actor could approve away the very check that catches their
+#     self-approval)
 #   - an exception matching no current error is flagged so the register
 #     stays clean
 #

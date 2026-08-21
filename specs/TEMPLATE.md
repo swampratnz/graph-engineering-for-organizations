@@ -77,7 +77,9 @@ pathology_guards:
 
 kill_switch:
   how: "Disable the agent identity in registry/agents.yaml and revoke its credentials"
-  authorized: [security-owner, owner] # no approval needed to stop; approval needed to restart
+  authorized: [security-owner, github-handle] # concrete handles, not role words:
+                                      # each is compared literally. No approval
+                                      # needed to stop; approval needed to restart.
 ---
 
 # <Workflow name>

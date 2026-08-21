@@ -6,12 +6,16 @@ Run from the repo root: python3 scripts/validate.py
 Exit code 0 = clean, 1 = errors. Warnings never fail the build.
 
 Every error carries a GE-* code. Most errors can be temporarily waived by an
-entry in governance/exceptions.yaml (named approver who is not the target
-spec's owner or backup, expiry <= 90 days); waived errors print as warnings.
-Two codes are never waivable:
+entry in governance/exceptions.yaml (named approver who is not a party the
+waiver benefits, expiry <= 90 days); waived errors print as warnings. The
+approver check resolves the benefiting parties for every legal target form (a
+spec name or its file path, an agent id, and the registry and anchor files),
+so a waiver cannot dodge it by naming the same finding a different way. Three
+codes are never waivable:
 
   GE-FROZEN-WRITE  writes to a frozen measurement instrument
   GE-SELF-APPROVE  a spec owner reviewing/escalation-target of their own gates
+  GE-HUMAN-ROLE    a governance role held by a registered agent identity
 
 Identity handles (owners, backups, reviewers, escalation targets, approvers)
 are compared case-insensitively; GitHub handles are case-insensitive, so
@@ -54,7 +58,9 @@ from __future__ import annotations
 
 import datetime
 import json
+import string
 import sys
+import unicodedata
 from pathlib import Path
 
 import yaml
@@ -74,8 +80,17 @@ CODEOWNERS_PATH = ROOT / ".github" / "CODEOWNERS"
 EXCLUDED_SPEC_FILES = {SPEC_DIR / "TEMPLATE.md", SPEC_DIR / "README.md"}
 
 ACTIVE_STATUSES = {"pilot", "promoted"}
-NON_WAIVABLE = {"GE-FROZEN-WRITE", "GE-SELF-APPROVE"}
+# Never bend, and the validator refuses exceptions targeting them: frozen
+# instruments (GE-FROZEN-WRITE), separation of duties (GE-SELF-APPROVE), and
+# human-only governance roles (GE-HUMAN-ROLE). A waivable GE-HUMAN-ROLE would
+# let a spec owner self-approve putting an agent identity in a kill-switch or
+# review role, so it is load-bearing enough to be non-waivable.
+NON_WAIVABLE = {"GE-FROZEN-WRITE", "GE-SELF-APPROVE", "GE-HUMAN-ROLE"}
 MAX_EXCEPTION_DAYS = 90
+
+# Identity handles are ASCII, matching the schema pattern ^[a-z0-9][a-z0-9-]*$.
+_HANDLE_START = frozenset(string.ascii_lowercase + string.digits)
+_HANDLE_CHARS = _HANDLE_START | {"-"}
 
 TODAY = datetime.date.today()
 
@@ -90,8 +105,28 @@ used_exceptions: set[str] = set()
 
 
 def norm(handle) -> str | None:
-    """GitHub handles are case-insensitive; compare them that way."""
-    return handle.casefold() if isinstance(handle, str) else handle
+    """GitHub handles are case-insensitive; compare them that way. Also strip
+    surrounding whitespace and apply NFKC normalization, so a trailing space or
+    a compatibility variant cannot masquerade as a different identity in an
+    equality check."""
+    if not isinstance(handle, str):
+        return handle
+    return unicodedata.normalize("NFKC", handle).strip().casefold()
+
+
+def is_handle(value) -> bool:
+    """True if value is a syntactically valid identity handle: ASCII, matching
+    the schema's handle pattern (^[a-z0-9][a-z0-9-]*$) case-insensitively.
+
+    Used to constrain exception approver handles, the one identity surface the
+    JSON Schema does not cover. Rejecting whitespace and non-ASCII look-alikes
+    (homoglyphs) here stops a self-approver from slipping past GE-EXC-SELF as a
+    string that only looks independent (`alice ` with a trailing space, or a
+    Cyrillic `аlice`)."""
+    if not isinstance(value, str) or not value:
+        return False
+    s = value.casefold()
+    return s.isascii() and s[0] in _HANDLE_START and all(c in _HANDLE_CHARS for c in s)
 
 
 def rel(path: Path | str) -> str:
@@ -174,7 +209,8 @@ def load_exceptions() -> None:
         if code in NON_WAIVABLE:
             err(EXCEPTIONS_PATH, "GE-EXC-NONWAIVABLE",
                 f"exception {exc_id!r} targets non-waivable code {code}; "
-                "frozen instruments and separation of duties never bend")
+                "frozen instruments, separation of duties, and human-only "
+                "governance roles never bend")
             continue
         if code.startswith("GE-EXC-"):
             err(EXCEPTIONS_PATH, "GE-EXC-NONWAIVABLE",
@@ -187,6 +223,13 @@ def load_exceptions() -> None:
         if not isinstance(approvers, list) or not approvers:
             err(EXCEPTIONS_PATH, "GE-EXC-INVALID",
                 f"exception {exc_id!r}: approved_by must be a non-empty list")
+            continue
+        bad_handles = [a for a in approvers if not is_handle(a)]
+        if bad_handles:
+            err(EXCEPTIONS_PATH, "GE-EXC-INVALID",
+                f"exception {exc_id!r}: approver(s) {bad_handles!r} are not "
+                "valid handles (ASCII [a-z0-9][a-z0-9-]*); whitespace or "
+                "look-alike characters cannot stand in for a real approver")
             continue
         granted, expires = as_date(entry["granted"]), as_date(entry["expires"])
         if granted is None or expires is None:
@@ -208,26 +251,38 @@ def load_exceptions() -> None:
 
 
 def prune_self_approved_exceptions(specs: list[tuple[Path, dict]],
-                                   agents: dict[str, dict]) -> None:
+                                   agents: dict[str, dict],
+                                   resources: dict[str, dict]) -> None:
     """An exception approved by a party the waiver benefits is void.
 
-    Resolvable for every legal target form, not just spec names:
-      - spec name        -> that spec's owner + backup_owner
-      - agent id         -> that agent's owner (GE-CRED-STANDING / GE-AGENT-RECERT
-                            are emitted with the agent id as target)
-      - registry path    -> the union of ALL agent owners, so a coarse
-                            file-level waiver of an agent rule can only be
-                            approved by someone who owns no agent in it.
-    A target with no resolvable interested party (e.g. a spec-name target on
-    an agent-scoped code, which no longer matches anything) is left alone; the
-    stale-exception warning surfaces it.
+    err() matches a waiver against a finding by BOTH the explicit target and
+    the finding's file path, so the benefiting parties must be resolvable for
+    every one of those target forms or a waiver could dodge the check by naming
+    the same finding a different way (the spec's file path instead of its
+    name, say):
+      - spec name / spec file path -> that spec's owner + backup_owner
+      - agent id                   -> that agent's owner (GE-CRED-STANDING /
+                                      GE-AGENT-RECERT carry the agent id)
+      - registry/agents.yaml       -> the union of ALL agent owners
+      - registry/resources.yaml    -> the union of ALL resource owners
+      - anchor table file          -> every spec owner/backup (who could claim
+                                      an anchor) and every resource owner (who
+                                      owns an instrument)
+    A file-level target resolves to the union of every party in that file, so a
+    coarse waiver can only be signed by someone who owns nothing in it. A
+    target that resolves to none of these forms is not a legal waiver target:
+    self-approval cannot be evaluated for it, so it is rejected (GE-EXC-INVALID)
+    rather than applied blind.
     """
     interested: dict[str, set[str]] = {}
-    for _, fm in specs:
+    all_spec_parties: set[str] = set()
+    for path, fm in specs:
+        parties = {norm(fm.get("owner")), norm(fm.get("backup_owner"))} - {None}
+        all_spec_parties |= parties
         name = fm.get("name")
         if isinstance(name, str):
-            interested[name] = {norm(fm.get("owner")),
-                                norm(fm.get("backup_owner"))} - {None}
+            interested[name] = set(parties)
+        interested[rel(path)] = set(parties)
     all_agent_owners: set[str] = set()
     for agent_id, entry in agents.items():
         owner = norm(entry.get("owner"))
@@ -235,14 +290,26 @@ def prune_self_approved_exceptions(specs: list[tuple[Path, dict]],
         if owner is not None:
             all_agent_owners.add(owner)
     interested[rel(AGENTS_PATH)] = all_agent_owners
+    all_resource_owners = {norm(r.get("owner")) for r in resources.values()} - {None}
+    interested[rel(RESOURCES_PATH)] = all_resource_owners
+    if ANCHORS_DIR.exists():
+        for apath in ANCHORS_DIR.glob("*.yaml"):
+            if apath.name == "TEMPLATE.yaml":
+                continue
+            interested[rel(apath)] = all_spec_parties | all_resource_owners
     for entry in exception_entries:
         target = str(entry["target"])
+        exc_id = str(entry["id"])
         owners = interested.get(target)
-        if not owners:
+        if owners is None:
+            err(EXCEPTIONS_PATH, "GE-EXC-INVALID",
+                f"exception {exc_id!r} target {target!r} is not a known spec "
+                "name, spec file, agent id, or registry/anchor file; a waiver "
+                "whose beneficiaries cannot be resolved is not permitted")
+            active_exceptions.pop((target, str(entry["code"])), None)
             continue
         bad = [a for a in entry["approved_by"] if norm(a) in owners]
         if bad:
-            exc_id = str(entry["id"])
             err(EXCEPTIONS_PATH, "GE-EXC-SELF",
                 f"exception {exc_id!r} approved by {bad}; a party the waiver "
                 f"of {target!r} benefits cannot approve it; the waiver is void")
@@ -547,6 +614,15 @@ def check_cost(path: Path, fm: dict) -> None:
 
 
 def check_ownership(path: Path, fm: dict) -> None:
+    # The schema declares created/review_by as format: date, but Draft 2020-12
+    # treats format as an annotation, so a non-date string passes structural
+    # validation. review_by has its own date backstop below; created gets one
+    # here so `created: banana` cannot validate clean.
+    created = fm.get("created")
+    if created is not None and as_date(created) is None:
+        err(path, "GE-SCHEMA",
+            f"created {created!r} is not a date (YYYY-MM-DD)",
+            target=fm.get("name"))
     review_by = as_date(fm.get("review_by"))
     if fm.get("review_by") is not None and review_by is None:
         err(path, "GE-ORPHAN", f"review_by {fm.get('review_by')!r} is not a date",
@@ -608,19 +684,21 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
                         f"{a!r}, a registered agent identity; only humans "
                         "pull kill switches")
         # An active agent is JIT-compliant only if credentials is a mapping
-        # that explicitly declares kind: jit. Anything else that is present
-        # (a bare scalar like "standing", a list, or a dict missing kind) is
-        # an unverified/standing credential, not a pass. A falsy/missing
-        # credentials block is already caught above as GE-REG.
+        # that explicitly declares kind: jit. Anything else -- a bare scalar
+        # like "standing", a list, a dict missing kind, or an empty/missing
+        # block -- is an unverified or standing credential, never a pass. The
+        # empty/missing case is also reported as GE-REG above (registry
+        # hygiene), but it must ALSO raise the credential-specific signal, so
+        # it cannot be relieved through the softer, coarser registry code.
         creds = entry.get("credentials")
-        if status == "active" and creds:
-            kind = creds.get("kind") if isinstance(creds, dict) else creds
-            if kind != "jit":
-                err(AGENTS_PATH, "GE-CRED-STANDING",
-                    f"agent {agent_id!r} has {kind!r} credentials; "
-                    "policy requires JIT/ephemeral (docs/platform-hardening.md); "
-                    "a standing credential needs an expiring exception",
-                    target=agent_id)
+        if status == "active" and not (isinstance(creds, dict)
+                                       and creds.get("kind") == "jit"):
+            shown = creds.get("kind") if isinstance(creds, dict) else creds
+            err(AGENTS_PATH, "GE-CRED-STANDING",
+                f"agent {agent_id!r} has {shown!r} credentials; policy "
+                "requires a mapping with kind: jit (docs/platform-hardening.md); "
+                "an empty or non-jit credential is standing/unverified and "
+                "needs an expiring exception", target=agent_id)
         review_by = as_date(entry.get("review_by"))
         if entry.get("review_by") is not None and review_by is None:
             err(AGENTS_PATH, "GE-REG",
@@ -675,7 +753,7 @@ def main() -> int:
     # resurfaces instead of being silently swallowed; and every waivable check
     # (agent registry, anchor tables, pass 2) runs after the prune so none can
     # consult a register entry that is about to be voided.
-    prune_self_approved_exceptions(specs, agents)
+    prune_self_approved_exceptions(specs, agents, resources)
     check_agent_registry(agents)
     anchor_tables = load_anchor_tables(resources)
 

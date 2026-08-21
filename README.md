@@ -116,8 +116,9 @@ surfaces without traffic). Every error carries a `GE-*` code
 
 Out-of-compliance states are only sanctioned via
 [`governance/exceptions.yaml`](governance/exceptions.yaml): named approver,
-mandatory expiry (≤ 90 days), checked by CI. Two rules never bend: frozen
-instrument writes and self-approval (see [`SECURITY.md`](SECURITY.md)).
+mandatory expiry (≤ 90 days), checked by CI. Three rules never bend: frozen
+instrument writes, self-approval, and a governance role held by an agent
+identity (see [`SECURITY.md`](SECURITY.md)).
 
 ## Adding a workflow
 

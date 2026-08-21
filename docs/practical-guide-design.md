@@ -475,8 +475,9 @@ rendering.
 ## 5. Non-goals and invariants
 
 - **No rule changes.** The validator, schemas, non-waivable rules
-  (`GE-FROZEN-WRITE`, `GE-SELF-APPROVE`), and decision rights are out of
-  scope and unchanged. This design adds explanation, not policy.
+  (`GE-FROZEN-WRITE`, `GE-SELF-APPROVE`, `GE-HUMAN-ROLE`), and decision
+  rights are out of scope and unchanged. This design adds explanation, not
+  policy.
 - **No "SME edition."** One repo, one validator, one rule set; the paths
   differ in *scope and sequencing*, never in strictness.
 - **No duplicated normative text.** Guide layers link; operational files
