@@ -72,7 +72,7 @@ read this as the honest boundary of the green checkmark:
 | `GE-AGENT-INACTIVE` | An active (pilot/promoted) spec references an agent whose status isn't `active` | Restart the agent per [decision rights](../governance/decision-rights.md) (approval required) or deactivate the spec |
 | `GE-AGENT-NOOWNER` | Agent entry has no human owner | Name one person, not a team alias |
 | `GE-AGENT-NOKILL` | Agent entry has no kill switch | Add `kill_switch.how` plus named `authorized` holders |
-| `GE-CRED-STANDING` | An active agent's `credentials.kind` isn't `jit` | Move to OIDC exchange or per-agent App tokens ([hardening](platform-hardening.md)); a standing credential needs an expiring exception |
+| `GE-CRED-STANDING` | An active agent's credentials are anything other than a mapping with `kind: jit` (a non-`jit` kind, a bare scalar, or a dict missing `kind`) | Move to OIDC exchange or per-agent App tokens ([hardening](platform-hardening.md)); a standing credential needs an expiring exception |
 | `GE-AGENT-RECERT` | An active agent's `review_by` has passed | Re-verify owner, scopes, and kill switch; bump the date (quarterly review) |
 | `GE-REG` | A registry file is malformed: missing/duplicate ids, missing required fields, unknown status, kill switch authorizing no one, non-date `review_by` | Fix the named entry |
 
