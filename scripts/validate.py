@@ -607,14 +607,20 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
                         f"agent {agent_id!r} kill switch authorizes "
                         f"{a!r}, a registered agent identity; only humans "
                         "pull kill switches")
+        # An active agent is JIT-compliant only if credentials is a mapping
+        # that explicitly declares kind: jit. Anything else that is present
+        # (a bare scalar like "standing", a list, or a dict missing kind) is
+        # an unverified/standing credential, not a pass. A falsy/missing
+        # credentials block is already caught above as GE-REG.
         creds = entry.get("credentials")
-        if status == "active" and isinstance(creds, dict) \
-                and creds.get("kind") != "jit":
-            err(AGENTS_PATH, "GE-CRED-STANDING",
-                f"agent {agent_id!r} has {creds.get('kind')!r} credentials; "
-                "policy requires JIT/ephemeral (docs/platform-hardening.md); "
-                "a standing credential needs an expiring exception",
-                target=agent_id)
+        if status == "active" and creds:
+            kind = creds.get("kind") if isinstance(creds, dict) else creds
+            if kind != "jit":
+                err(AGENTS_PATH, "GE-CRED-STANDING",
+                    f"agent {agent_id!r} has {kind!r} credentials; "
+                    "policy requires JIT/ephemeral (docs/platform-hardening.md); "
+                    "a standing credential needs an expiring exception",
+                    target=agent_id)
         review_by = as_date(entry.get("review_by"))
         if entry.get("review_by") is not None and review_by is None:
             err(AGENTS_PATH, "GE-REG",

@@ -106,6 +106,19 @@ class ValidatorCase(unittest.TestCase):
         self.edit(self.repo / "registry" / "agents.yaml",
                   "      kind: jit", "      kind: pat")
 
+    def _standing_release_bot_scalar(self) -> None:
+        """example-release-bot with a non-dict `credentials` value. This is
+        the form that evaded GE-CRED-STANDING before the credential check
+        stopped requiring credentials to be a dict: the kind check was
+        skipped entirely for a bare scalar."""
+        self.edit(
+            self.repo / "registry" / "agents.yaml",
+            '    credentials:\n'
+            '      kind: jit\n'
+            '      scope: "repo:example/notes-page write; telemetry read-only"\n'
+            '      issued_via: "CI OIDC exchange, 1h TTL, no standing secrets"',
+            "    credentials: standing")
+
     def _exc(self, target: str, approver: str) -> str:
         return (
             "exceptions:\n"
@@ -191,6 +204,36 @@ class ValidatorCase(unittest.TestCase):
             self._exc("governance/exceptions.yaml", "security-owner")
             .replace("GE-CRED-STANDING", "GE-EXC-SELF"))
         self.assert_error(run_validator(self.repo), "GE-EXC-NONWAIVABLE")
+
+    # -- non-dict credentials must not evade the standing-credential check --
+    def test_non_dict_credentials_are_standing(self):
+        # A bare `credentials: standing` scalar is not a verified JIT
+        # credential and must be flagged, not silently accepted.
+        self._standing_release_bot_scalar()
+        self.assert_error(run_validator(self.repo), "GE-CRED-STANDING")
+
+    def test_void_does_not_suppress_scalar_credential(self):
+        # The reported gap: with a non-dict standing credential, a
+        # self-approved waiver produced only GE-EXC-SELF and swallowed the
+        # credential error. Both must now surface, with no WAIVED line.
+        self._standing_release_bot_scalar()
+        self.set_exceptions(self._exc("example-release-bot", "alice"))
+        res = run_validator(self.repo)
+        self.assertEqual(res.returncode, 1, res.stdout)
+        self.assertIn("GE-EXC-SELF", res.stdout)
+        self.assertIn("GE-CRED-STANDING", res.stdout)
+        self.assertNotIn("WAIVED", res.stdout)
+
+    def test_independent_approver_waives_scalar_credential(self):
+        # The other half of the same gap: the independent-approver waiver
+        # must produce a WAIVED line, not a "matches no current error"
+        # warning (which meant the error never fired to be matched).
+        self._standing_release_bot_scalar()
+        self.set_exceptions(self._exc("example-release-bot", "security-owner"))
+        res = run_validator(self.repo)
+        self.assert_clean(res)
+        self.assertIn("WAIVED", res.stdout)
+        self.assertNotIn("matches no current error", res.stdout)
 
 
 if __name__ == "__main__":
