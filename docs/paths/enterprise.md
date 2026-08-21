@@ -36,10 +36,15 @@ table is what compliance teams actually ask for.
 
 Timeline as of 2026-08 (re-verify before relying on it; these dates
 moved once already): EU AI Act GPAI obligations have applied since
-**Aug 2025**; Article 50 transparency since **Aug 2026**; the Digital
-Omnibus (mid-2026) postponed high-risk obligations to **Dec 2027**
-(Annex III) and **Aug 2028** (Annex I)
-([analysis](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/)).
+**2 Aug 2025**; Article 50 transparency since **2 Aug 2026** (with a
+transitional period to **2 Dec 2026** for the machine-readable marking
+duties under Art. 50(2) on systems already on the market); and the
+Digital Omnibus, now
+[**Regulation (EU) 2026/1744**](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)
+(Official Journal 24 Jul 2026, in force 27 Jul 2026), postponed
+high-risk obligations to **2 Dec 2027** (Annex III) and **2 Aug 2028**
+(Annex I)
+([summary](https://www.hunton.com/privacy-and-cybersecurity-law-blog/eu-digital-omnibus-on-ai-enters-into-force)).
 [Article 14](https://artificialintelligenceact.eu/article/14/), human
 oversight with the real ability to intervene and interrupt to a safe
 state, is the regulatory mirror of this repo's gate contracts and kill

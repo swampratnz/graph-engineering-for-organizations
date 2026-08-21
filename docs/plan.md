@@ -14,7 +14,7 @@ this document.
 4. **Idempotency is non-negotiable.** Any node with side effects must be safe to retry. Derive idempotency keys from (run_id, step_id).
 5. **Distribution is a solved problem in the Claude stack.** Dynamic workflows are shareable across teams via plugins (namespaced, versioned, SHA-pinnable marketplaces). Org-level skill/plugin provisioning supports group-scoped rollout. Admins can disable workflows via managed settings. This is the spec-repo-as-team-IP layer, productized.
 6. **Agent identity governance is the widest industry gap.** Large majorities of organizations have no documented policy for creating/removing AI identities. Emerging consensus: every agent gets a unique first-class identity (delegation, not impersonation), human owner, JIT/ephemeral credentials, kill switch, and a registry. The Salesloft-Drift breach pattern (compromised agent credentials indistinguishable from legitimate activity) is the canonical failure.
-7. **Regulation is arriving.** EU AI Act treats much high-impact multi-agent orchestration as high-risk: human oversight, immutable audit trails, incident testing, persistent identity through the agent lifecycle. Building the audit plane now is cheaper than retrofitting.
+7. **Regulation is arriving.** Whether a given workflow is high-risk under the EU AI Act is a legal determination made by use case (Annex I/III), not by its being multi-agent (`governance/compliance-mapping.md`). Where a workflow is in scope, the obligations that bite are human oversight, immutable audit trails, incident testing, and persistent identity through the agent lifecycle. Building the audit plane now is cheaper than retrofitting.
 8. **Multi-agent pathologies are documented.** Sycophancy cascading (agents converge on confident wrong consensus), infinite handoff loops, non-converging debates. Mitigations: caps on rounds, small group sizes, fresh-context verifiers, arbitration defaults, and external anchors.
 9. **Selective human validation works.** Production HITL pipelines hit very high automation rates by routing only low-confidence/exception cases to humans, not by gating everything.
 
@@ -152,10 +152,12 @@ numbers flagged [vendor].
    Salesloft-Drift breach as the canonical failure pattern.
 7. **Regulation**: [EU AI Act Article 14 (human oversight, safe
    interrupt)](https://artificialintelligenceact.eu/article/14/); GPAI
-   obligations live Aug 2025; high-risk obligations postponed to Dec
-   2027 / Aug 2028 by the mid-2026 Digital Omnibus
-   ([analysis](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/));
-   re-verify dates before relying on them.
+   obligations live 2 Aug 2025; Article 50 transparency live 2 Aug 2026;
+   high-risk obligations postponed to 2 Dec 2027 (Annex III) / 2 Aug 2028
+   (Annex I) by the Digital Omnibus,
+   [Regulation (EU) 2026/1744](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)
+   (OJ 24 Jul 2026, in force 27 Jul 2026); re-verify dates before
+   relying on them.
 8. **Multi-agent pathologies**: cataloged in [OWASP's agentic threat
    corpus](https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/)
    (cascading failures, HITL flooding); sycophancy-cascade and

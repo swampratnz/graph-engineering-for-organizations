@@ -33,3 +33,6 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: python3 scripts/validate.py
+      # The validator's red/green is the product, so it gets a regression
+      # suite (stdlib unittest, no extra deps).
+      - run: python3 -m unittest discover -s tests

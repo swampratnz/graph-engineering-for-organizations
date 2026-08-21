@@ -95,10 +95,13 @@ def norm(handle) -> str | None:
 
 
 def rel(path: Path | str) -> str:
+    # Always forward-slash: exception targets are written with "/", and this
+    # value is both printed and used as an exception-match key. Path.relative_to
+    # would yield "\" on Windows, so local runs would disagree with Linux CI.
     try:
-        return str(Path(path).relative_to(ROOT))
+        return Path(path).relative_to(ROOT).as_posix()
     except ValueError:
-        return str(path)
+        return Path(path).as_posix()
 
 
 def err(path: Path | str, code: str, msg: str, target: str | None = None) -> None:
@@ -188,26 +191,45 @@ def load_exceptions() -> None:
         active_exceptions[(str(entry["target"]), code)] = exc_id
 
 
-def prune_self_approved_exceptions(specs: list[tuple[Path, dict]]) -> None:
-    """An exception approved by the target spec's own owner/backup is void."""
-    owners_by_name: dict[str, set[str]] = {}
+def prune_self_approved_exceptions(specs: list[tuple[Path, dict]],
+                                   agents: dict[str, dict]) -> None:
+    """An exception approved by a party the waiver benefits is void.
+
+    Resolvable for every legal target form, not just spec names:
+      - spec name        -> that spec's owner + backup_owner
+      - agent id         -> that agent's owner (GE-CRED-STANDING / GE-AGENT-RECERT
+                            are emitted with the agent id as target)
+      - registry path    -> the union of ALL agent owners, so a coarse
+                            file-level waiver of an agent rule can only be
+                            approved by someone who owns no agent in it.
+    A target with no resolvable interested party (e.g. a spec-name target on
+    an agent-scoped code, which no longer matches anything) is left alone; the
+    stale-exception warning surfaces it.
+    """
+    interested: dict[str, set[str]] = {}
     for _, fm in specs:
         name = fm.get("name")
         if isinstance(name, str):
-            owners_by_name[name] = {norm(fm.get("owner")),
-                                    norm(fm.get("backup_owner"))} - {None}
+            interested[name] = {norm(fm.get("owner")),
+                                norm(fm.get("backup_owner"))} - {None}
+    all_agent_owners: set[str] = set()
+    for agent_id, entry in agents.items():
+        owner = norm(entry.get("owner"))
+        interested[agent_id] = {owner} - {None}
+        if owner is not None:
+            all_agent_owners.add(owner)
+    interested[rel(AGENTS_PATH)] = all_agent_owners
     for entry in exception_entries:
         target = str(entry["target"])
-        owners = owners_by_name.get(target)
+        owners = interested.get(target)
         if not owners:
             continue
         bad = [a for a in entry["approved_by"] if norm(a) in owners]
         if bad:
             exc_id = str(entry["id"])
             err(EXCEPTIONS_PATH, "GE-EXC-SELF",
-                f"exception {exc_id!r} approved by {bad}; the owner/backup "
-                f"of {target!r} cannot approve their own exception; the "
-                "waiver is void")
+                f"exception {exc_id!r} approved by {bad}; a party the waiver "
+                f"of {target!r} benefits cannot approve it; the waiver is void")
             active_exceptions.pop((target, str(entry["code"])), None)
 
 
@@ -571,7 +593,8 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
             err(AGENTS_PATH, "GE-CRED-STANDING",
                 f"agent {agent_id!r} has {creds.get('kind')!r} credentials; "
                 "policy requires JIT/ephemeral (docs/platform-hardening.md); "
-                "a standing credential needs an expiring exception")
+                "a standing credential needs an expiring exception",
+                target=agent_id)
         review_by = as_date(entry.get("review_by"))
         if entry.get("review_by") is not None and review_by is None:
             err(AGENTS_PATH, "GE-REG",
@@ -581,7 +604,7 @@ def check_agent_registry(agents: dict[str, dict]) -> None:
             err(AGENTS_PATH, "GE-AGENT-RECERT",
                 f"agent {agent_id!r} recertification lapsed {review_by}; "
                 "re-verify owner, scopes, and kill switch, then bump "
-                "review_by")
+                "review_by", target=agent_id)
 
 
 def main() -> int:
@@ -598,7 +621,6 @@ def main() -> int:
     agents = load_registry(AGENTS_PATH, "agents")
     resources = load_registry(RESOURCES_PATH, "resources")
     anchor_tables = load_anchor_tables(resources)
-    check_agent_registry(agents)
     agent_ids = {norm(a) for a in agents}
 
     if not CODEOWNERS_PATH.exists():
@@ -623,7 +645,11 @@ def main() -> int:
                     f"duplicate spec name {name!r} (also in {rel(names[name])})")
             names[name] = path
 
-    prune_self_approved_exceptions(specs)
+    # Void self-approved exceptions BEFORE any waivable check runs; the
+    # agent-registry checks (GE-CRED-STANDING, GE-AGENT-RECERT) are waivable
+    # and must consult the pruned register, so they follow the prune.
+    prune_self_approved_exceptions(specs, agents)
+    check_agent_registry(agents)
 
     # Pass 2: checks (err() consults the pruned exception register).
     for path, fm in specs:

@@ -9,28 +9,35 @@
 # Rules (validated by scripts/validate.py):
 #   - every entry: id, target, code, reason, approved_by, granted, expires
 #   - approved_by must name the security/identity owner or the shared
-#     services maintainer (a human handle). An approver who is the target
-#     spec's owner or backup_owner voids the exception; CI enforces this
-#     (GE-EXC-SELF); reviewers still confirm the approver actually holds
-#     one of the two privileged roles.
+#     services maintainer (a human handle). CI voids an exception approved
+#     by a party the waiver benefits (GE-EXC-SELF): the target spec's owner
+#     or backup for a spec-name target, the agent's owner for an agent-id
+#     target, any agent owner for a registry-file target. The validator
+#     compares handle strings; reviewers still confirm the approver is a
+#     real human who actually holds one of the two privileged roles (there
+#     is no machine roster of role-holders yet; see the FAQ).
 #   - expires is mandatory, max 90 days out from granted; an expired entry
 #     is a CI error until removed or consciously renewed by PR
 #   - non-waivable codes (GE-FROZEN-WRITE, GE-SELF-APPROVE) are rejected
 #   - an exception matching no current error is flagged so the register
 #     stays clean
 #
-# target: the spec's `name` from its frontmatter, or a registry path like
-#   "registry/agents.yaml" for registry-level rules.
+# target: what the CI error is anchored to; use the most specific form:
+#   - a spec `name` (from frontmatter) for spec-scoped codes
+#   - an agent id for the agent-scoped codes GE-CRED-STANDING and
+#     GE-AGENT-RECERT (owner-resolvable, so self-approval is caught)
+#   - a registry path like "registry/agents.yaml" for file-level codes
 # code:   the GE-* code printed with the CI error being waived.
 #
-# Example entry:
+# Example entry (a standing credential on one agent, waived by an
+# independent approver while a host migration removes the need):
 #   - id: EX-2026-001
-#     target: weekly-release-review
+#     target: example-release-bot        # the agent id, not its spec
 #     code: GE-CRED-STANDING
 #     reason: >
 #       Notes-page host has no OIDC support; standing token scoped to one
 #       page, rotated weekly by hand while we migrate hosts.
-#     approved_by: [security-owner]
+#     approved_by: [security-owner]      # not the agent's owner or backup
 #     granted: 2026-08-20
 #     expires: 2026-10-01
 
