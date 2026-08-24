@@ -64,6 +64,7 @@ live rungs: [suggest-only](specs/example-team/ci-failure-explainer.md) →
 | [`docs/faq.md`](docs/faq.md) · [`docs/glossary.md`](docs/glossary.md) | Objections answered · one home per term |
 | [`docs/plan.md`](docs/plan.md) | The canonical implementation plan |
 | [`docs/practical-guide-design.md`](docs/practical-guide-design.md) | Decision record: research-backed design for the practical-guide layer (primer, tutorial, size-segmented adoption paths) |
+| [`docs/build-pipeline-design.md`](docs/build-pipeline-design.md) | Decision record: an auto build pipeline for this repo, reviewed from a production pipeline and expressed as a GRAPH SPEC (this repo governing its own automation) |
 | [`docs/walkthrough.md`](docs/walkthrough.md) | Plain-language tour: a small team using this on a live repo |
 | [`docs/implementation-examples.md`](docs/implementation-examples.md) | Runtime decision table and crosswalk; concrete runtimes: ticket-based, LangGraph, Temporal; sampling mechanics; CI wiring |
 | [`docs/validator-errors.md`](docs/validator-errors.md) | Reference: every `GE-*` error code, with meaning, fix, and waivability |
